@@ -19,18 +19,24 @@ const Homepage = () => {
       alert('Login failed. Please try again.');
     }
   };
-
+const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.\nFun starts at your doorstep! But where will it take you?"
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#121212' }}>
-      <div className="flex flex-col md:flex-row items-center gap-12 w-full max-w-6xl px-8">
+
+      <div className="flex flex-col justify-start md:flex-row items-start gap-12 w-full max-w-9xl px-8">
         {/* Left side - Logo */}
-        <div className="flex-1 flex justify-left">
+        <div className="flex-1 flex justify-start">
           <img src={Logo} alt="Logo" className="w-64 h-64 object-contain" />
         </div>
 
-        <div className="flex-1 flex justify-center">
-          <p className="text-white text-center text-lg leading-relaxed max-w-xs">
-            Welcome to Fstiva! Your one-stop shop of global festivals. Fun starts at your doorstep! But where will it take you? 
+        <div className="flex-1 flex justify-start">
+          <p className="text-white text-left text-lg leading-relaxed max-w-xs">
+            {welcomeText.split('\n').map((line, index) => (
+              <span key={index}>
+                {line}
+                <br />
+              </span>
+            ))}
           </p>
         </div>
 
@@ -39,7 +45,7 @@ const Homepage = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
               type="email"
-              placeholder="Email"
+              placeholder="@ Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full p-3 rounded bg-white text-black"
