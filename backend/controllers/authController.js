@@ -23,7 +23,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email, role: 'user' });
+        const user = await User.findOne({ email, role: { $ne: 'admin' } });
         if (user && (await bcrypt.compare(password, user.password))) {
             res.json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
         } else {
@@ -57,9 +57,12 @@ const getProfile = async (req, res) => {
   
       res.status(200).json({
         name: user.name,
+        dateofbirth: user.dateofbirth,
+        country: user.country,
+        city: user.city,
         email: user.email,
-        university: user.university,
-        address: user.address,
+        phone: user.phone,
+        gender: user.gender
       });
     } catch (error) {
       res.status(500).json({ message: 'Server error', error: error.message });
@@ -71,14 +74,17 @@ const updateUserProfile = async (req, res) => {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        const { name, email, university, address } = req.body;
+        const { name, dateofbirth, email, country, city, phone, gender } = req.body;
         user.name = name || user.name;
+        user.dateofbirth = dateofbirth || user.dateofbirth;
         user.email = email || user.email;
-        user.university = university || user.university;
-        user.address = address || user.address;
+        user.country = country || user.country;
+        user.city = city || user.city;
+        user.phone = phone || user.phone;
+        user.gender = gender || user.gender;
 
         const updatedUser = await user.save();
-        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, university: updatedUser.university, address: updatedUser.address, token: generateToken(updatedUser.id) });
+        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, dateofbirth: updatedUser.dateofbirth, country: updatedUser.country, city: updatedUser.city, phone: updatedUser.phone, gender: updatedUser.gender, token: generateToken(updatedUser.id) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

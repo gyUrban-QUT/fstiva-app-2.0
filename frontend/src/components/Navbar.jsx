@@ -1,6 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/logo.png';
+import Exit from '../assets/Exit.svg';
+import Avatar from '../assets/avatar.svg';
+import Notif from '../assets/notification.svg';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -8,30 +11,95 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
+
   return (
-    <nav className="text-white p-4 flex justify-between items-center" style={{ backgroundColor: '#311B3D' }}>
+    <nav className="text-white p-4 flex items-center gap-4" style={{ backgroundColor: '#311B3D' }}>
       <Link to="/" className="text-2xl font-bold flex items-center">
         <img src={Logo} alt="Logo" className="h-8 w-8 mr-2" />
-        Fstiva
+        Fstiva App
       </Link>
-      <div>
+      <div className="flex-1 justify-end flex items-center gap-4">
+        {/* user Navbar */}
         {user ? (
-          <>
-            <Link to="/tasks" className="mr-4">Tasks</Link>
-            <Link to="/profile" className="mr-4">Profile</Link>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </>
+          user.role === 'admin' ? ( 
+            <>
+            <div className="flex items-center justify-between w-full">
+             <div>
+              <button 
+                className="p-3 w-72 font-semibold text-black hover:opacity-80"
+                style={{ backgroundColor: '#8A6F98' }}
+                onClick={() => navigate('/tasks')}
+              > My events
+                </button>
+                </div>
+              <div>
+              <button 
+                className="p-3 w-72 font-semibold text-black hover:opacity-80"
+                style={{ backgroundColor: '#8A6F98' }}
+                onClick={() => navigate('/tasks')}
+              > My events
+                </button>
+                </div>
+              <div>
+              <button 
+                className="p-3 w-72 font-semibold text-black hover:opacity-80"
+                style={{ backgroundColor: '#8A6F98' }}
+                onClick={() => navigate('/tasks')}
+              > My events
+                </button>
+                </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Link to="/profile" className="mr-4">
+                <img src={Avatar} alt="Avatar" className="w-10 h-10 object-contain" />
+                </Link>
+                <img src={Notif} alt="Notification" className="w-10 h-10 object-contain" />
+                <div className="flex-1 flex justify-start">
+                  <button onClick={handleLogout}>
+                  <img src={Exit} alt="Exit" className="w-8 h-8 object-contain" />
+                  </button>
+                </div>
+              </div>
+              </div>
+            </>
+          ) : (
+            <>
+            <div className="flex items-center justify-between w-full">
+             <div>
+              <button 
+                className="p-3 w-72 font-semibold text-black hover:opacity-80"
+                style={{ backgroundColor: '#8A6F98' }}
+                onClick={() => navigate('/tasks')}
+              > My events
+                </button>
+                </div>
+              <div>
+              <button 
+                className="p-3 w-72 font-semibold text-black hover:opacity-80"
+                style={{ backgroundColor: '#8A6F98' }}
+                onClick={() => navigate('/tasks')}
+              > My events
+                </button>
+                </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Link to="/profile" className="mr-4">
+                <img src={Avatar} alt="Avatar" className="w-10 h-10 object-contain" />
+                </Link>
+                <img src={Notif} alt="Notification" className="w-10 h-10 object-contain" />
+                <div className="flex-1 flex justify-start">
+                  <button onClick={handleLogout}>
+                  <img src={Exit} alt="Exit" className="w-8 h-8 object-contain" />
+                  </button>
+                </div>
+              </div>
+              </div>
+            </>
+          )
         ) : (
           <>
-            <Link to="/login" className="mr-4">Login</Link>
+            {/* <Link to="/login" className="mr-4">Login</Link> */}
             <Link
               to="/register"
               className="px-4 py-2 rounded hover:opacity-80"
