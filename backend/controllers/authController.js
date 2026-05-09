@@ -90,4 +90,23 @@ const updateUserProfile = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, loginAdmin, updateUserProfile, getProfile };
+const updatePassword = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const { currentPassword, newPassword } = req.body;
+
+        if (!(await bcrypt.compare(currentPassword, user.password))) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
+
+        user.password = newPassword;
+
+        const updatedPass = await user.save();
+        res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+module.exports = { registerUser, loginUser, loginAdmin, updateUserProfile, getProfile, updatePassword };

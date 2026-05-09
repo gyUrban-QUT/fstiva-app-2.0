@@ -4,7 +4,9 @@ import Navbar from './components/Navbar';
 import AdminLogin from './pages/AdminLogin';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
-import Tasks from './pages/Tasks';
+import Userpage from './pages/Userpage';
+import Adminpage from './pages/Adminpage';
+
 
 function App() {
   return (
@@ -15,7 +17,8 @@ function App() {
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/tasks" element={<Tasks />} />
+        <Route path="/userpage" element={<Userpage />} />
+        <Route path="/adminpage" element={<Adminpage />} />
       </Routes>
     </Router>
   );

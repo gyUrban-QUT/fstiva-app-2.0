@@ -26,31 +26,7 @@ const Navbar = () => {
         {user ? (
           user.role === 'admin' ? ( 
             <>
-            <div className="flex items-center justify-between w-full">
-             <div>
-              <button 
-                className="p-3 w-72 font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#8A6F98' }}
-                onClick={() => navigate('/tasks')}
-              > My events
-                </button>
-                </div>
-              <div>
-              <button 
-                className="p-3 w-72 font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#8A6F98' }}
-                onClick={() => navigate('/tasks')}
-              > My events
-                </button>
-                </div>
-              <div>
-              <button 
-                className="p-3 w-72 font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#8A6F98' }}
-                onClick={() => navigate('/tasks')}
-              > My events
-                </button>
-                </div>
+            <div className="flex items-center justify-end w-full">
               <div style={{ display: 'flex', gap: '10px' }}>
                 <Link to="/profile" className="mr-4">
                 <img src={Avatar} alt="Avatar" className="w-10 h-10 object-contain" />
@@ -66,12 +42,12 @@ const Navbar = () => {
             </>
           ) : (
             <>
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center justify-end w-full">
              <div>
               <button 
                 className="p-3 w-72 font-semibold text-black hover:opacity-80"
                 style={{ backgroundColor: '#8A6F98' }}
-                onClick={() => navigate('/tasks')}
+                onClick={() => navigate('/userpage')}
               > My events
                 </button>
                 </div>
@@ -79,7 +55,7 @@ const Navbar = () => {
               <button 
                 className="p-3 w-72 font-semibold text-black hover:opacity-80"
                 style={{ backgroundColor: '#8A6F98' }}
-                onClick={() => navigate('/tasks')}
+                onClick={() => navigate('/userpage')}
               > My events
                 </button>
                 </div>

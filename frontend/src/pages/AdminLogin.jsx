@@ -13,7 +13,7 @@ const AdminLogin = () => {
     try {
       const response = await axiosInstance.post('/api/auth/admin/login', formData);
       login(response.data);
-      navigate('/tasks');
+      navigate('/adminpage');
     } catch (error) {
       alert('Login failed. Please try again.');
     }

@@ -41,12 +41,26 @@ const TaskForm = ({ tasks, setTasks, editingTask, setEditingTask }) => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
-      <h1 className="text-2xl font-bold mb-4">{editingTask ? 'Edit Task' : 'Add Task'}</h1>
+      <h1 className="text-2xl font-bold mb-4">{editingTask ? 'Edit Event' : 'Add New Event'}</h1>
       <input
         type="text"
         placeholder="Title"
         value={formData.title}
         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        className="w-full mb-4 p-2 border rounded"
+      />
+      <input
+        type="text"
+        placeholder="Date"
+        value={formData.date}
+        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+        className="w-full mb-4 p-2 border rounded"
+      />
+            <input
+        type="text"
+        placeholder="Location"
+        value={formData.location}
+        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
         className="w-full mb-4 p-2 border rounded"
       />
       <input
@@ -57,9 +71,10 @@ const TaskForm = ({ tasks, setTasks, editingTask, setEditingTask }) => {
         className="w-full mb-4 p-2 border rounded"
       />
       <input
-        type="date"
-        value={formData.deadline}
-        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+        type="text"
+        placeholder="Ticket Price"
+        value={formData.price}
+        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
         className="w-full mb-4 p-2 border rounded"
       />
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
