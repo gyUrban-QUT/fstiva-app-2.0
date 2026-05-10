@@ -5,11 +5,16 @@ import axiosInstance from '../axiosConfig';
 import Logo from '../assets/logo.png';
 import Picnic from '../assets/picnic.svg';
 import NightParty from '../assets/nightparty.png';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Homepage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,13 +66,21 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full p-3 rounded bg-white text-black"
             />
-            <input
-              type="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full p-3 rounded bg-white text-black"
-            />
+            <div className="relative w-full mb-4">
+                <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full mb-4 p-2 border rounded"
+                />
+                <span
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-3 top-3 cursor-pointer text-gray-600"
+                >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+            </div>
             <button
               type="submit"
               className="w-full p-3 rounded font-semibold text-black hover:opacity-80"
