@@ -1,17 +1,23 @@
-**Task Manager Application Overview:The task manager application is designed to help users efficiently manage their tasks and responsibilities by providing a user-friendly interface for creating, viewing, updating, and deleting tasks. It includes essential features such as secure user authentication, allowing individuals to sign up and log in to their accounts, as well as profile management to update personal information. With built-in validation such as input field validation and email validation, the application ensures a seamless user experience while enhancing productivity and organization in both personal and professional settings. **
+**Fstiva App: this app serves the main purpose of selling music festival tickets to the general public.
+In Order to do so, it enables system administrators to log on safely and view, create, update and delete tickets available for sale. Administrators can see and modify entries set up by other administrators.
+Users have the ability to safely sign in, view tickets available for sale, purchase them or cancel existing purchases. Users cannot create new records, cannot edit existing records and cannot see purchases of other users.
+Both users and administrators can update their profile and securely change their password. **
 
-**This apps **contain** the following features:**
+**This apps **contains** the following features:**
 
-* Signup
-* Login
+* registration - users only
+* user login
+* admin login
 * Logout
 * Update profile
-* Add tasks
-* View tasks
-* Update tasks
-* Delete tasks
+* Change Password
+* Create event
+* View event
+* Update event
+* Delete event
+* Book event
+* Cancal event
 
-**This **app**lication** is**almost **a** precompiled** app**. However, students will develop some features,**such as adding tasks, viewing tasks, updating tasks, and **deleting** tasks**. **Students** will interact with GitHub when they develop the features.**
 
 ---
 
