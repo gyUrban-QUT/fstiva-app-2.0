@@ -34,19 +34,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-const loginAdmin = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email, role: 'admin' });
-        if (user && (await bcrypt.compare(password, user.password))) {
-            res.json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
-        } else {
-            res.status(401).json({ message: 'Invalid admin credentials' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
 
 const getProfile = async (req, res) => {
     try {
@@ -105,6 +92,20 @@ const updatePassword = async (req, res) => {
 
         const updatedPass = await user.save();
         res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const loginAdmin = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email, role: 'admin' });
+        if (user && (await bcrypt.compare(password, user.password))) {
+            res.json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
+        } else {
+            res.status(401).json({ message: 'Invalid admin credentials' });
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
