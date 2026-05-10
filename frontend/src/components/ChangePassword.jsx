@@ -59,7 +59,7 @@ const ChangePassword = ({ onClose }) => {
             />
             <span
                 onClick={toggleOldPasswordVisibility}
-                className="absolute right-3 top-3 cursor-pointer text-gray-600"
+                className="absolute right-3 top-3 cursor-pointer text-gray-400"
             >
                 {showOldPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
@@ -74,7 +74,7 @@ const ChangePassword = ({ onClose }) => {
           />
             <span
                 onClick={toggleNewPasswordVisibility}
-                className="absolute right-3 top-3 cursor-pointer text-gray-600"
+                className="absolute right-3 top-3 cursor-pointer text-gray-400"
             >
                 {showNewPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
@@ -89,7 +89,7 @@ const ChangePassword = ({ onClose }) => {
           />
             <span
                 onClick={toggleRepeatPasswordVisibility}
-                className="absolute right-3 top-3 cursor-pointer text-gray-600"
+                className="absolute right-3 top-3 cursor-pointer text-gray-400"
             >
                 {showRepeatPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
