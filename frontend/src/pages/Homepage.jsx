@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import Logo from '../assets/logo.png';
 import Picnic from '../assets/picnic.svg';
-import NightParty from '../assets/nightparty.png';
+import NightParty from '../assets/nightparty_cropped.PNG';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Homepage = () => {
@@ -29,10 +29,15 @@ const Homepage = () => {
 const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.\nFun starts at your doorstep! But where will it take you?"
   return (
     <div className="min-h-screen flex flex-col items-center justify-top" style={{ backgroundColor: '#121212' }}>
-        <div className="w-full flex justify-left pt-8 pb-8 px-8">
-            <div className="rounded-2xl border-2 p-4 inline-block" style={{ borderColor: '#F08B00' }}>
-                <img src={NightParty} alt="Night Party" className="w-96 h-72 object-contain" />
-            </div>
+        <div className="w-full flex justify-left pt-8 pb-8 px-8 gap-24">
+       
+            <div className="rounded-2xl border-4 p-4 inline-block opacity-50 w-full " style={{ borderColor: '#F08B00'}}>
+              <div className="flex flex-col justify-start md:flex-row items-start gap-12 max-w-9xl px-8">
+                
+                <img src={NightParty} alt="Night Party" className="w-full h-72 object-contain" />
+                
+              </div>
+            </div>    
         </div>
 
       <div className="flex flex-col justify-start md:flex-row items-start gap-12 w-full max-w-9xl px-8">
@@ -76,7 +81,7 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
                 />
                 <span
                     onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-3 cursor-pointer text-gray-600"
+                    className="absolute right-3 top-3 cursor-pointer text-gray-400"
                 >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
