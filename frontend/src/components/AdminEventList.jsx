@@ -14,7 +14,7 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
   const { user } = useAuth(); // Get current user for auth token
   const [selectedId, setSelectedId] = useState(null); // Track which card is expanded
   const [showEditEvent, setShowEditEvent] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   // Handles deleting an event via API
   const handleDelete = async (eventId) => {
     try {
