@@ -4,7 +4,9 @@ const { getAllEvents, getUserEvents, buyEvent, cancelUserEvent } = require('../c
 const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.route('/').get(protect, getAllEvents).post(protect, buyEvent);
+router.get('/all', protect, getAllEvents);
+
+router.route('/').get(protect, getUserEvents).post(protect, buyEvent);
 router.route('/:id').delete(protect, cancelUserEvent);
 
 module.exports = router;
