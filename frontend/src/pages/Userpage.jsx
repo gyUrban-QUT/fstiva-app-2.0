@@ -4,6 +4,10 @@ import axiosInstance from '../axiosConfig';
 import UserEventList from '../components/UserEventList';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/logo.png';
+import Truck from '../assets/truck.png';
+import DJ from '../assets/dj.png';
+import Singer from '../assets/singer.png';
+import Crowd from '../assets/crowd.png';
 
 
 
@@ -36,20 +40,24 @@ return null;
   return (
     <div className="h-screen w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#121212' }}>
       {/* Top of page - Logo and greeting */}
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col justify-start md:flex-row items-start gap-6 w-full max-w-9xl px-8">
+        <div className="flex-1 flex justify-start">
           <img src={Logo} alt="Logo" className="w-48 h-48 object-contain" />
-          <p className="text-white text-left text-4xl font-bold leading-relaxed">
+          <p className="text-white text-left text-4xl font-bold leading-relaxed self-end">
             Hey, <span style={{ color: '#F08B00' }}>{user?.name}</span>!
           </p>
         </div>
-      {/* <div className="container mx-auto p-6"> */}
-        {/* <TaskForm
-          tasks={tasks}
-          setTasks={setTasks}
-          editingTask={editingTask}
-          setEditingTask={setEditingTask}
-        /> */}
-          <div className="w-full flex justify-center pt-12 w-full">
+        {/* <div className="rounded-2xl border-4 p-4 inline-block opacity-50 w-4/6 " style={{ borderColor: '#F08B00'}}> */}
+          <div className="flex flex-col justify-start md:flex-row items-start gap-6 px-8 opacity-50">
+            <img src={DJ} alt="DJ" className="w-full h-48 object-contain" />
+            <img src={Singer} alt="Singer" className="w-full h-48 object-contain" />
+            <img src={Crowd} alt="Crowd" className="w-full h-48 object-contain" />
+            <img src={Truck} alt="Truck" className="w-full h-48 object-contain" />
+          </div>
+            
+      </div>
+{/* middle of page: list of events booked by user */}
+      <div className="w-full flex justify-center pt-12 w-full">
         <div className="rounded-2xl border-2 p-4 inline-block" 
           style={{ borderColor: '#121212', backgroundColor: '#121212'  }}>
           <UserEventList events={events} setEvents={setEvents} />

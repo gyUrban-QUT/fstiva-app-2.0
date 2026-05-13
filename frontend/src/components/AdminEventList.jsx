@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import EditEvent from '../components/EditEvent';
+import { getEventImage } from '../assets/eventImages';
 
 const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
   const { user } = useAuth(); // Get current user for auth token
@@ -42,6 +43,9 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
           >
           <div className="flex flex-row items-start gap-8 w-full max-w-9xl px-8">
           {/* Event details */}
+          <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
+            <img src={getEventImage(event.imagekey)} alt={event.title} />
+          </div>
           <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
             <h2 className="font-bold text-black break-words">{event.title}</h2>
           </div>

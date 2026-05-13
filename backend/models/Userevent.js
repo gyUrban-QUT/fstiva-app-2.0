@@ -10,6 +10,7 @@ const userEventSchema = new mongoose.Schema({
     price: { type: String, required: true },
     purchased: { type: Boolean, default: false },
     purchasedate: { type: Date },
+    imagekey: { type: String },
 });
 
 module.exports = mongoose.model('UserEvent', userEventSchema);

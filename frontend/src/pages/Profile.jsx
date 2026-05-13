@@ -5,6 +5,10 @@ import PhoneInput from 'react-phone-input-2/lib/lib.js';
 import 'react-phone-input-2/lib/style.css';
 import Logo from '../assets/logo.png';
 import ChangePassword from '../components/ChangePassword';
+import Truck from '../assets/truck.png';
+import DJ from '../assets/dj.png';
+import Singer from '../assets/singer.png';
+import Crowd from '../assets/crowd.png';
 
 
 const Profile = () => {
@@ -68,16 +72,30 @@ const Profile = () => {
   }
 
   return (
-    <div className="flex flex-col justify-start md:flex-row items-start gap-12 w-full max-w-9xl px-8">
+<div className="h-screen w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#ffffff' }}>
+  <div className="flex flex-col justify-start md:flex-row items-start w-full max-w-9xl px-8">
         {/* Left side - Logo and greeting */}
-        <div className="flex items-center gap-4">
+     {/* Top of page - Logo and greeting */}
+      <div className="flex flex-col justify-start md:flex-row items-start gap-6 w-full max-w-9xl px-8">
+        <div className="flex-1 flex justify-start">
           <img src={Logo} alt="Logo" className="w-48 h-48 object-contain" />
-          <p className="text-black text-left text-4xl font-bold leading-relaxed">
-            Hey, <span style={{ color: '#F08B00' }}>{formData.name}</span>!
+          <p className="text-black text-left text-4xl font-bold leading-relaxed self-end">
+            Hey, <span style={{ color: '#F08B00' }}>{user?.name}</span>!
           </p>
         </div>
-
-    <div className="max-w-md ml-auto mt-20">
+      </div>
+      {/* <div className="rounded-2xl border-4 p-4 inline-block opacity-50 w-4/6 " style={{ borderColor: '#F08B00'}}> */}
+      <div className="w-full flex justify-center pt-12 w-full">
+        <div className="flex flex-col justify-start md:flex-row items-start gap-6 px-8 opacity-50">
+          <img src={DJ} alt="DJ" className="w-full h-48 object-contain" />
+          <img src={Singer} alt="Singer" className="w-full h-48 object-contain" />
+          <img src={Crowd} alt="Crowd" className="w-full h-48 object-contain" />
+          <img src={Truck} alt="Truck" className="w-full h-48 object-contain" />
+        </div> 
+      </div>
+    </div>
+    
+    <div className="max-w-md ml-auto mt-20 justify-center">
       <h1 className="text-2xl font-bold mb-4 text-center">Update Your Profile</h1>
       <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
         <input
@@ -140,8 +158,9 @@ const Profile = () => {
       {showChangePassword && (
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
-    </div>
-      </div>
+        </div>
+</div>
+
   );
 };
 

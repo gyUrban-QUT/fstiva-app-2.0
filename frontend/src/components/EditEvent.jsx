@@ -4,7 +4,7 @@ import axiosInstance from '../axiosConfig';
 
 const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }) => {
   const { user } = useAuth();
-  const [formData, setFormData] = useState({ title: '', description: '', date: '', location: '', price: '' });
+  const [formData, setFormData] = useState({ title: '', description: '', date: '', location: '', price: '', imagekey: '' });
 
    useEffect(() => {
     if (editingEvent) {
@@ -14,9 +14,10 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
         date: editingEvent.date,
         location: editingEvent.location,
         price: editingEvent.price,
+        imagekey: editingEvent.imagekey,
       });
     } else {
-      setFormData({ title: '', description: '', date: '', location: '', price: '' });
+      setFormData({ title: '', description: '', date: '', location: '', price: '', imagekey: '' });
     }
   }, [editingEvent]);
 
@@ -80,6 +81,13 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
             placeholder="Price"
             value={formData.price}
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            className="w-full mb-4 p-2 border rounded"
+          />
+          <input
+            type="text"
+            placeholder="Image Key"
+            value={formData.imagekey}
+            onChange={(e) => setFormData({ ...formData, imagekey: e.target.value })}
             className="w-full mb-4 p-2 border rounded"
           />
           <button

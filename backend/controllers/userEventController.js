@@ -27,9 +27,9 @@ const getUserEvents = async (req, res) => {
 
 // buy event function
 const buyEvent = async (req, res) => {
-    const { title, date, location, description, price } = req.body;
+    const { title, date, location, description, price, imagekey } = req.body;
     try {
-        const event = await Userevent.create({ userId: req.user.id, title, date, location, description, price, purchased: true, purchasedate: new Date() });
+        const event = await Userevent.create({ userId: req.user.id, title, date, location, description, price, purchased: true, purchasedate: new Date(), imagekey });
         res.status(201).json(event);
     } catch (error) {
         res.status(500).json({ message: error.message });
