@@ -1,6 +1,7 @@
 import { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
+import { getEventImage } from '../assets/eventImages';
 
 const UserFindEvents = ({  onClose, onReserved }) => {
   const { user } = useAuth();
@@ -41,6 +42,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
           price: event.price,
           purchased: true,
           purchaseDate: new Date().toISOString(),
+          imagekey: event.imagekey,
         },
         {
           headers: { Authorization: `Bearer ${user.token}` },
@@ -89,6 +91,10 @@ const UserFindEvents = ({  onClose, onReserved }) => {
               style={{ borderColor: '#272727', backgroundColor: '#272727' }}
             >
               <div className="flex flex-row items-start gap-8 w-full px-4">
+                <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+                  <img src={getEventImage(event.imagekey)} alt={event.title} />
+                </div>
+
                 <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
                   <h3 className="font-bold text-white break-words">{event.title}</h3>
                 </div>

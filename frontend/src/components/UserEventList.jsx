@@ -10,6 +10,7 @@ import { useState, useEffect} from 'react';
 import axiosInstance from '../axiosConfig';
 import Empty from '../assets/emptycart.svg';
 import UserFindEvents from '../components/UserFindEvents';
+import { getEventImage } from '../assets/eventImages';
 
 
 const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) => {
@@ -84,6 +85,9 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
         >
           <div className="flex flex-row items-start gap-2 max-w-9xl px-8">
           {/* Event details */}
+          <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+            <img src={getEventImage(event.imagekey)} alt={event.title} />
+          </div>
           <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
             <h2 className="font-bold text-white break-words">{event.title}</h2>
           </div>
