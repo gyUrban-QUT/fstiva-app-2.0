@@ -6,10 +6,11 @@
 //   - setEditingEvent: Callback to set the event being edited
 
 import { useAuth } from '../context/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import axiosInstance from '../axiosConfig';
 import Empty from '../assets/emptycart.svg';
 import UserFindEvents from '../components/UserFindEvents';
+
 
 const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) => {
   const { user } = useAuth(); // Get current user for auth token
@@ -51,6 +52,9 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
     setEvents((prevEvents) => [...prevEvents, newReservation]);
   };
 
+
+
+
   return (
         <div className=" w-full flex-col items-center justify-center gap-12 mt-8"> 
           <div className="mb-6 flex justify-left">
@@ -85,13 +89,13 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
           </div>
           <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">
-            Date: {new Date(event.date).toLocaleDateString()}
+            Date: {event.date}
           </p>
           </div>
           <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">{event.location}</p>
           </div>
-          <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-4/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">{event.description}</p>
           </div>
           <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
@@ -137,3 +141,5 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
       
 
 export default UserEventList;
+
+

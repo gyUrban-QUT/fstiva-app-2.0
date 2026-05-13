@@ -51,7 +51,7 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
           <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
             <h2 className="font-bold text-black break-words">{event.location}</h2>
           </div>
-          <div className="w-96 border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-3/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#ffffff' }}>
             <p className="text-black break-words">{event.description}</p>
           </div>
           <div className="w-96 border p-2" style={{ borderColor: '#ffffff' }}>

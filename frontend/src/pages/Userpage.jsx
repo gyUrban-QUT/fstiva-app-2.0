@@ -49,8 +49,9 @@ return null;
           editingTask={editingTask}
           setEditingTask={setEditingTask}
         /> */}
-          <div className="w-full flex justify-center pt-12">
-        <div className="rounded-2xl border-2 p-4 inline-block" style={{ borderColor: '#121212', backgroundColor: '#121212'  }}>
+          <div className="w-full flex justify-center pt-12 w-full">
+        <div className="rounded-2xl border-2 p-4 inline-block" 
+          style={{ borderColor: '#121212', backgroundColor: '#121212'  }}>
           <UserEventList events={events} setEvents={setEvents} />
 
         </div>
