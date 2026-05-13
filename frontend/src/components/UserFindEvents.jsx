@@ -56,12 +56,13 @@ const UserFindEvents = ({  onClose, onReserved }) => {
     }
   };
  return (
+    <div className="flex items-center justify-center w-full">
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center "
       onClick={onClose}
     >
       <div
-        className="w-full max-w-6xl max-h-[85vh] overflow-y-auto rounded-2xl border-2 p-6"
+        className="w-4/5 max-h-[85vh] overflow-y-auto rounded-2xl border-2 p-6"
         style={{ borderColor: '#F08B00', backgroundColor: '#121212' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -84,31 +85,31 @@ const UserFindEvents = ({  onClose, onReserved }) => {
           allEvents.map((event) => (
             <div
               key={event._id}
-              className="mb-4 rounded-2xl border-2 p-4"
-              style={{ borderColor: '#F08B00', backgroundColor: '#ffffff' }}
+              className="mb-4 rounded-2xl border-2 p-4 w-full"
+              style={{ borderColor: '#272727', backgroundColor: '#272727' }}
             >
-              <div className="flex flex-row items-start gap-8 w-full max-w-9xl px-4">
-                <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
-                  <h3 className="font-bold text-black break-words">{event.title}</h3>
+              <div className="flex flex-row items-start gap-8 w-full px-4">
+                <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+                  <h3 className="font-bold text-white break-words">{event.title}</h3>
                 </div>
 
-                <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
-                  <p className="text-black break-words">{event.date}</p>
+                <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+                  <p className="text-white break-words">{event.date}</p>
                 </div>
 
-                <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
-                  <p className="text-black break-words">{event.location}</p>
+                <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+                  <p className="text-white break-words">{event.location}</p>
                 </div>
 
-                <div className="w-96 border p-2" style={{ borderColor: '#ffffff' }}>
-                  <p className="text-black break-words">{event.description}</p>
+                <div className="w-4/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#272727' }}>
+                  <p className="text-white break-words">{event.description}</p>
                 </div>
 
-                <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
-                  <p className="text-black break-words">Tickets from: {event.price}</p>
+                <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+                  <p className="text-white break-words">Tickets from: {event.price}</p>
                 </div>
 
-                <div className="border p-2" style={{ borderColor: '#ffffff' }}>
+                <div className="border p-2" style={{ borderColor: '#272727' }}>
                   <button
                     className="rounded p-2 font-semibold text-black hover:opacity-80 disabled:opacity-50"
                     style={{ backgroundColor: '#F08B00' }}
@@ -127,6 +128,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
           ))
         )}
       </div>
+    </div>
     </div>
   );
 };
