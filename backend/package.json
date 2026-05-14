@@ -4,7 +4,8 @@
   "description": "Backend for Task Manager App",
   "main": "server.js",
   "scripts": {
-    "test": "mocha",
+    
+    "test": "mocha", 
     "start": "node server.js",
     "dev": "nodemon server.js",
     "prod": "node server.js"

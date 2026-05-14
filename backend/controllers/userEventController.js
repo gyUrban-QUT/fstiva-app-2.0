@@ -43,7 +43,7 @@ const cancelUserEvent = async (req, res) => {
         if (event.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Unauthorized' });
 
         await event.deleteOne();
-        res.json({ message: 'Reservation canceled' });
+        res.json({ message: 'Reservation cancelled' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
