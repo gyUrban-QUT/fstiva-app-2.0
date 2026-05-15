@@ -72,7 +72,7 @@ const Register = () => {
                     onClick={togglePasswordVisibility}
                     className="absolute right-3 top-3 cursor-pointer text-gray-400"
                 >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </span>
             </div>
         <div className="relative w-full mb-4">
@@ -87,7 +87,7 @@ const Register = () => {
                     onClick={toggleConfirmPasswordVisibility}
                     className="absolute right-3 top-3 cursor-pointer text-gray-400"
                 >
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
                 </span>
             </div>
         <button type="submit" className="w-full text-white p-2 rounded" style={{ backgroundColor: '#F08B00' }}>

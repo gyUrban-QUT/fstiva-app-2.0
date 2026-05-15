@@ -85,7 +85,7 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
                     onClick={togglePasswordVisibility}
                     className="absolute right-3 top-3 cursor-pointer text-gray-400"
                 >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </span>
             </div>
             <button
