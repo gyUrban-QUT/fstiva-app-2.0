@@ -2,6 +2,8 @@ import { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
+
+
 const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({ title: '', description: '', date: '', location: '', price: '', imagekey: '' });
