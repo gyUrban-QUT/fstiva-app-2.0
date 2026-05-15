@@ -58,7 +58,7 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
 
   return (
         <div className=" w-full flex-col items-center justify-center gap-12 mt-8"> 
-          <div className="mb-6 flex justify-left">
+          <div className={`mb-6 flex ${events.length > 0 ? 'justify-left' : 'justify-center'}`}>
             <button
               className="p-2 rounded font-semibold text-black hover:opacity-80"
               style={{ backgroundColor: '#F08B00' }}
@@ -131,8 +131,8 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
         </div>
         </div>
       ))) : (
-        <div className="flex flex-col items-center justify-center gap-12 mt-8">
-          <div className="flex flex-col items-center justify-center mt-8">
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center gap-4">
             <img src={Empty} alt="No reservations" className="w-64 h-64 mb-4 opacity-50" />
             <p className="text-gray-400 text-lg">Nothing to see here ... for now.</p>
           </div>
