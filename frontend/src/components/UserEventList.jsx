@@ -11,12 +11,16 @@ import axiosInstance from '../axiosConfig';
 import Empty from '../assets/emptycart.svg';
 import UserFindEvents from '../components/UserFindEvents';
 import { getEventImage } from '../assets/eventImages';
+import ConfirmationPopup from '../components/ConfirmationPopup';
 
 
 const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) => {
   const { user } = useAuth(); // Get current user for auth token
   
   const [showUserFindEvents, setShowUserFindEvents] = useState(false);
+
+    // handles popup for cancel confirmation
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
   
   useEffect(() => {
       const fetchEvents = async () => {
@@ -36,8 +40,8 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
   // Handles cancelling a reservation by deleting the event via API
   const handleDelete = async (event) => {
     // const eventToDelete = events.find((event) => event._id === eventId);
-    const confirmDelete = window.confirm('Are you sure you want to cancel this reservation?');
-    if (!confirmDelete) return;
+    // const confirmDelete = window.confirm('Are you sure you want to cancel this reservation?');
+    // if (!confirmDelete) return;
     try {
       await axiosInstance.delete(`/api/userevents/${event._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -118,14 +122,23 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
               </button> */}
               <button
                 onClick={() => {
-                  handleDelete(event);
-                  // window.location.reload(); // Refreshes the current page
+                  setShowConfirmationPopup(true);
                 }}
                 className="p-2 rounded font-semibold text-black hover:opacity-80"
                 style={{ backgroundColor: '#F08B00' }}
               >
                 Cancel Reservation
               </button>
+              <ConfirmationPopup
+                    isOpen={showConfirmationPopup}
+                    onClose={() => setShowConfirmationPopup(false)}
+                    onConfirm={() => {
+                      handleDelete(event);
+                      setShowConfirmationPopup(false);
+                    }}
+                    title="Confirm Cancellation"
+                    message="Are you sure you want to cancel this reservation?"
+                  />
             </div>
           </div>
         </div>

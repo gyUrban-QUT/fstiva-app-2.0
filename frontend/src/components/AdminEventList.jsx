@@ -10,12 +10,19 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import EditEvent from '../components/EditEvent';
 import { getEventImage } from '../assets/eventImages';
+import ConfirmationPopup from '../components/ConfirmationPopup';
+
 
 const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
   const { user } = useAuth(); // Get current user for auth token
   const [selectedId, setSelectedId] = useState(null); // Track which card is expanded
   const [showEditEvent, setShowEditEvent] = useState(false);
+
+  // handles popup for delete confirmation
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
+  
   // const [loading, setLoading] = useState(false);
+
   // Handles deleting an event via API
   const handleDelete = async (eventId) => {
     try {
@@ -68,31 +75,48 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
 
           {/* Action buttons - shown when card is clicked */}
           {selectedId === event._id && (
-            <div className="mt-3 flex gap-2 px-8" onClick={(e) => e.stopPropagation()}>
-              <button
-                className="p-2 rounded font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#F08B00' }}
-                onClick={() => setShowEditEvent(true)}
-              >
-                Edit Event
-              </button>
-            {showEditEvent && (
-                    <EditEvent
-                      events={events}
-                      setEvents={setEvents}
-                      editingEvent={event}
-                      setEditingEvent={() => setShowEditEvent(false)}
-                      onClose={() => setShowEditEvent(false)}
-                    />
-                  )}
-              <button
-                onClick={() => handleDelete(event._id)}
-                className="p-2 rounded font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#F08B00' }}
-              >
-                Delete Event
-              </button>
-            </div>
+            <>
+              <div className="mt-3 flex gap-2 px-8" onClick={(e) => e.stopPropagation()}>
+                <button
+                  className="p-2 rounded font-semibold text-black hover:opacity-80"
+                  style={{ backgroundColor: '#F08B00' }}
+                  onClick={() => setShowEditEvent(true)}
+                >
+                  Edit Event
+                </button>
+              {showEditEvent && (
+                      <EditEvent
+                        events={events}
+                        setEvents={setEvents}
+                        editingEvent={event}
+                        setEditingEvent={() => setShowEditEvent(false)}
+                        onClose={() => setShowEditEvent(false)}
+                      />
+                    )}
+                <button
+                  onClick={() => {
+                    setShowConfirmationPopup(true);
+                  }}
+                  className="p-2 rounded font-semibold text-black hover:opacity-80"
+                  style={{ backgroundColor: '#F08B00' }}
+                  
+                >
+                  Delete Event
+                </button>
+                <ConfirmationPopup
+                    isOpen={showConfirmationPopup}
+                    onClose={() => setShowConfirmationPopup(false)}
+                    onConfirm={() => {
+                      handleDelete(event._id);
+                      setShowConfirmationPopup(false);
+                    }}
+                    title="Confirm Deletion"
+                    message="Are you sure you want to delete this event?"
+                  />
+                
+              </div>
+              
+            </>
           )}
         </div>
       ))}
