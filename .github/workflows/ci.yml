@@ -57,7 +57,7 @@ jobs:
         df -h
         sudo rm -rf ./build
         yarn install
-        CI = ''
+        CI=''
         yarn run build
 
 
