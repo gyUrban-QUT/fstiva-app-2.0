@@ -3,7 +3,7 @@ In Order to do so, it enables system administrators to log on safely and view, c
 Users have the ability to safely sign in, view tickets available for sale, purchase them or cancel existing purchases. Users cannot create new records, cannot edit existing records and cannot see purchases of other users.
 Both users and administrators can update their profile and securely change their password. **
 
-**This apps **contains** the following features:**
+**This app **contains** the following features:**
 
 * registration - users only
 * user login
@@ -11,12 +11,12 @@ Both users and administrators can update their profile and securely change their
 * Logout
 * Update profile
 * Change Password
-* Create event
-* View event
-* Update event
-* Delete event
-* Book event
-* Cancal event
+* Create event (admin)
+* View event (admin)
+* Update event (admin)
+* Delete event (admin)
+* Book event (user)
+* Cancel event booking (user)
 
 
 ---
@@ -26,7 +26,5 @@ Both users and administrators can update their profile and securely change their
 * **Nodejs [**[https://nodejs.org/en](https://nodejs.org/en)]** **
 * **Git [**[https://git-scm.com/](https://git-scm.com/)]** **
 * **VS code editor** [[https://code.visualstudio.com/](https://code.visualstudio.com/)]** **
-* **MongoDB Account** [[https://account.mongodb.com/account/login](https://account.mongodb.com/account/login)]** - In tutorial, we have also showed how can you create account and database: follow step number 2.**
-* **GitHub Account** [[https://github.com/signup?source=login](https://github.com/signup?source=login)]** **
-
+* **MongoDB Account** [[https://account.mongodb.com/account/login](https://account.mongodb.com/account/login)]** - 
 ---
