@@ -16,60 +16,60 @@ let port;
 
 // Start the server before running tests
 // first function: test cases for getAllEvents function in userEventController.js
-// describe('getAllEvents Function Test', () => {
+describe('getAllEvents Function Test', () => {
 
-//     it('should retrieve events successfully', async () => {
-//         // Mock events. This is for admin users who can see all events. For regular users, we would filter by userId.
+    it('should retrieve events successfully', async () => {
+        // Mock events. This is for admin users who can see all events. For regular users, we would filter by userId.
 
-//         const events = [
-//             { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
-//             { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
-//         ];
+        const events = [
+            { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
+            { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
+        ];
 
-//         // Stub Event.find to return the mock events
-//         const findStub = sinon.stub(Event, 'find').resolves(events);
-//         // Mock request and response objects
-//         const req = {};
-//         const res = {
-//             json: sinon.spy(),
-//             status: sinon.stub().returnsThis()
-//         };
+        // Stub Event.find to return the mock events
+        const findStub = sinon.stub(Event, 'find').resolves(events);
+        // Mock request and response objects
+        const req = {};
+        const res = {
+            json: sinon.spy(),
+            status: sinon.stub().returnsThis()
+        };
 
-//         // Call the function
-//         await getAllEvents(req, res);
+        // Call the function
+        await getAllEvents(req, res);
 
-//         // Assertions
-//         // expect(findStub.calledOnceWith({ userId })).to.be.true;
-//         expect(res.json.calledWith(events)).to.be.true;
-//         expect(res.status.called).to.be.false; // No error status should be set
+        // Assertions
+        // expect(findStub.calledOnceWith({ userId })).to.be.true;
+        expect(res.json.calledWith(events)).to.be.true;
+        expect(res.status.called).to.be.false; // No error status should be set
 
-//         // Restore stubbed methods
-//         findStub.restore();
-//     });
+        // Restore stubbed methods
+        findStub.restore();
+    });
 
-//     it('should return 500 if an error occurs', async () => {
-//         // Stub Event.find to throw an error
-//         const findStub = sinon.stub(Event, 'find').throws(new Error('DB Error'));
+    it('should return 500 if an error occurs', async () => {
+        // Stub Event.find to throw an error
+        const findStub = sinon.stub(Event, 'find').throws(new Error('DB Error'));
 
-//         // Mock request and response objects
-//         const req = { };
-//         const res = {
-//             json: sinon.spy(),
-//             status: sinon.stub().returnsThis()
-//         };
+        // Mock request and response objects
+        const req = { };
+        const res = {
+            json: sinon.spy(),
+            status: sinon.stub().returnsThis()
+        };
 
-//         // Call the function
-//         await getAllEvents(req, res);
+        // Call the function
+        await getAllEvents(req, res);
 
-//         // Assertions
-//         expect(res.status.calledWith(500)).to.be.true;
-//         expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+        // Assertions
+        expect(res.status.calledWith(500)).to.be.true;
+        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
 
-//         // Restore stubbed methods
-//         findStub.restore();
+        // Restore stubbed methods
+        findStub.restore();
 
-//     });
-// });
+    });
+});
 
 // second function: test cases for getUserEvents function in userEventController.js
 // now we need to pass a userID
