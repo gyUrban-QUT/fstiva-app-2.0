@@ -10,9 +10,9 @@ const getEvents = async (req, res) => {
 };
 // add event function
 const addEvent = async (req, res) => {
-    const { title, date, location, description, price } = req.body;
+    const { title, date, location, description, price, imagekey } = req.body;
     try {
-        const event = await Event.create({ userId: req.user.id, title, date, location, description, price });
+        const event = await Event.create({ userId: req.user.id, title, date, location, description, price, imagekey });
         res.status(201).json(event);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -20,7 +20,7 @@ const addEvent = async (req, res) => {
 };
 // update event function
 const updateEvent = async (req, res) => {
-    const { title, date, location, description, price } = req.body;
+    const { title, date, location, description, price, imagekey } = req.body;
     try {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({ message: 'Event not found' });
@@ -31,6 +31,7 @@ const updateEvent = async (req, res) => {
         event.location = location || event.location;
         event.description = description || event.description;
         event.price = price || event.price;
+        event.imagekey = imagekey || event.imagekey;
         const updatedEvent = await event.save();
         res.json(updatedEvent);
     } catch (error) {
@@ -44,7 +45,7 @@ const deleteEvent = async (req, res) => {
         if (!event) return res.status(404).json({ message: 'Event not found' });
         if (event.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Unauthorized' });
 
-        await event.remove();
+        await event.deleteOne();
         res.json({ message: 'Event deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });

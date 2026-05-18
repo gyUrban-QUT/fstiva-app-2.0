@@ -1,18 +1,23 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+// import { useState } from 'react';
 import Logo from '../assets/logo.png';
 import Exit from '../assets/Exit.svg';
 import Avatar from '../assets/avatar.svg';
 import Notif from '../assets/notification.svg';
 import Home from '../assets/Home.svg';
 
+
 const Navbar = () => {
+  
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+
   const handleLogout = () => {
-    logout();
     navigate('/');
+    logout();
+    
   };
 
 
@@ -46,9 +51,11 @@ const Navbar = () => {
             </>
           ) : (
             <>
+
+              
             <div className="flex items-center justify-end w-full">
-             <div>
-                </div>
+              
+                {/* </div> */}
               <div style={{ display: 'flex', gap: '10px' }}>
                   <Link to="/userpage" className="mr-4">
                   <img src={Home} alt="Home" className="w-10 h-10 object-contain" />
@@ -64,6 +71,7 @@ const Navbar = () => {
                 </div>
               </div>
               </div>
+              
             </>
           )
         ) : (

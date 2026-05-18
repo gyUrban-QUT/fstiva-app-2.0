@@ -5,6 +5,8 @@ import axiosInstance from '../axiosConfig';
 import Logo from '../assets/logo.png';
 import Picnic from '../assets/picnic.svg';
 import NightParty from '../assets/nightparty_cropped.PNG';
+import DJ from '../assets/dj.png';
+import Singer from '../assets/singer.png';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Homepage = () => {
@@ -33,9 +35,9 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
        
             <div className="rounded-2xl border-4 p-4 inline-block opacity-50 w-full " style={{ borderColor: '#F08B00'}}>
               <div className="flex flex-col justify-start md:flex-row items-start gap-12 max-w-9xl px-8">
-                
+                <img src={DJ} alt="DJ" className="w-full h-72 object-contain" />
                 <img src={NightParty} alt="Night Party" className="w-full h-72 object-contain" />
-                
+                <img src={Singer} alt="Singer" className="w-full h-72 object-contain" />
               </div>
             </div>    
         </div>
@@ -47,11 +49,7 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
         </div>
         {/* Left side - Logo and image */}
         <div className="flex-1 flex-row justify-start">
-          
-        </div>
-
-        <div className="flex-1 flex justify-start">
-          <p className="text-white text-left text-lg leading-relaxed max-w-xs">
+           <p className="text-white text-left text-xl leading-relaxed max-w-xs">
             {welcomeText.split('\n').map((line, index) => (
               <span key={index}>
                 {line}
@@ -59,6 +57,10 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
               </span>
             ))}
           </p>
+        </div>
+
+        <div className="flex-1 flex justify-start">
+         
         </div>
 
         {/* Right side - Login Form */}
@@ -83,7 +85,7 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
                     onClick={togglePasswordVisibility}
                     className="absolute right-3 top-3 cursor-pointer text-gray-400"
                 >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </span>
             </div>
             <button

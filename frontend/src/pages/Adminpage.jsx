@@ -5,10 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/logo.png';
 import EditEvent from '../components/EditEvent';
 
+
 const AdminPage = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [showEditEvent, setShowEditEvent] = useState(false);
+  
   useEffect(() => {
     const fetchEvents = async () => {
       try {

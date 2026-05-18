@@ -2,11 +2,9 @@ import { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
-
-
-const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }) => {
+const BuyEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }) => {
   const { user } = useAuth();
-  const [formData, setFormData] = useState({ title: '', description: '', date: '', location: '', price: '', imagekey: '' });
+  const [formData, setFormData] = useState({ title: '', description: '', date: '', location: '', price: '' });
 
    useEffect(() => {
     if (editingEvent) {
@@ -16,10 +14,9 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
         date: editingEvent.date,
         location: editingEvent.location,
         price: editingEvent.price,
-        imagekey: editingEvent.imagekey,
       });
     } else {
-      setFormData({ title: '', description: '', date: '', location: '', price: '', imagekey: '' });
+      setFormData({ title: '', description: '', date: '', location: '', price: '' });
     }
   }, [editingEvent]);
 
@@ -27,12 +24,12 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
     e.preventDefault();
     try {
       if (editingEvent) {
-        const response = await axiosInstance.put(`/api/events/${editingEvent._id}`, formData, {
+        const response = await axiosInstance.put(`/api/userevents/${editingEvent._id}`, formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setEvents(events.map((event) => (event._id === response.data._id ? response.data : event)));
       } else {
-        const response = await axiosInstance.post('/api/events', formData, {
+        const response = await axiosInstance.post('/api/userevents', formData, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setEvents([...events, response.data]);
@@ -46,7 +43,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100">
-      <div className="flex h-auto w-[1000px] ">
+      <div class="flex h-auto w-[1000px] ">
       <div className="bg-white p-6 rounded shadow-md w-full">
         <h2 className="text-2xl font-bold mb-4 text-center">{editingEvent ? 'Edit Event' : 'Add New Event'}</h2>
         <form onSubmit={handleSubmit}>
@@ -83,13 +80,6 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
             placeholder="Price"
             value={formData.price}
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            className="w-full mb-4 p-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Image Key"
-            value={formData.imagekey}
-            onChange={(e) => setFormData({ ...formData, imagekey: e.target.value })}
             className="w-full mb-4 p-2 border rounded"
           />
           <button
