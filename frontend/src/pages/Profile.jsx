@@ -52,7 +52,7 @@ const Profile = () => {
   }, [user]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     try {
       await axiosInstance.put('/api/auth/profile', formData, {
