@@ -48,7 +48,7 @@ jobs:
       run: | 
        npm install --global yarn
        yarn --version
-       yarn install
+       yarn install --frozen-lockfile
       
     # Install dependencies for frontend
     - name: Install Frontend Dependencies
@@ -56,7 +56,8 @@ jobs:
       run: |
         df -h
         sudo rm -rf ./build
-        yarn install
+        yarn install --frozen-lockfile
+        CI=''
         yarn run build
 
 
