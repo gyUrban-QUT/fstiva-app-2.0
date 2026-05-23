@@ -29,7 +29,7 @@ const getUserEvents = async (req, res) => {
 const buyEvent = async (req, res) => {
     const { title, date, location, description, price, imagekey } = req.body;
     try {
-        const event = await Userevent.create({ userId: req.user.id, title, date, location, description, price, purchased: true, purchasedate: new Date(), imagekey });
+        const event = await Userevent.create({userId: req.user.id, title, date, location, description, price, purchased: true, purchasedate: new Date(), imagekey });
         res.status(201).json(event);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -42,8 +42,9 @@ const cancelUserEvent = async (req, res) => {
         if (!event) return res.status(404).json({ message: 'Event not found' });
         if (event.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Unauthorized' });
 
-        await event.deleteOne();
+        await event.deleteOne({_id: req.params.id});
         res.json({ message: 'Reservation cancelled' });
+        // console.log(req.params.id)
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
