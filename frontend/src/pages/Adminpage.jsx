@@ -12,6 +12,7 @@ const AdminPage = () => {
   const [showEditEvent, setShowEditEvent] = useState(false);
   
   useEffect(() => {
+    if (!user) return;  //if no user logged in handle elegantly
     const fetchEvents = async () => {
       try {
         const response = await axiosInstance.get('/api/events', {
