@@ -87,6 +87,7 @@ describe('getUserEvents Function Test', () => {
         date: new Date(),
         price: 50,
         imagekey: "image",
+        qty: 1,
         save: sinon.stub().resolvesThis(), // Mock save method
         }];
 
@@ -145,7 +146,7 @@ describe('buyEvent Function Test', () => {
     // Mock existing event
       const req = {
           user: { id: userId.toString() },
-          body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image" }
+          body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image", qty: 1 }
         };
          // Mock event that would be created
       const createdEvent = { _id: new mongoose.Types.ObjectId(), ...req.body, userId: req.user.id, purchased: true, purchasedate: new Date() };

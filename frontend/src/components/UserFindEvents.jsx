@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import { getEventImage } from '../assets/eventImages';
 
+
 const UserFindEvents = ({  onClose, onReserved }) => {
   const { user } = useAuth();
   const [allEvents, setAllEvents] = useState([]);  
@@ -34,7 +35,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
 
       const response = await axiosInstance.post(
         '/api/userevents',
-        {
+        { eventId: event._id,
           title: event.title,
           date: event.date,
           location: event.location,
@@ -43,6 +44,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
           purchased: true,
           purchaseDate: new Date().toISOString(),
           imagekey: event.imagekey,
+          qty: 1,
         },
         {
           headers: { Authorization: `Bearer ${user.token}` },
@@ -57,6 +59,8 @@ const UserFindEvents = ({  onClose, onReserved }) => {
       setSubmittingId(null);
     }
   };
+
+
  return (
     <div className="flex items-center justify-center w-full">
     <div
