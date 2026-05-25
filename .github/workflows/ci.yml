@@ -81,11 +81,11 @@ jobs:
 
     - run: pm2 restart all
 
-    - name: Run Build Script and Restart Apps
-      run: |
-        # 1. Run your existing shell script to pull dynamic dependencies and compile the frontend
-        /fstiva-app.sh
+    # - name: Run Build Script and Restart Apps
+    #   run: |
+    #     # 1. Run your existing shell script to pull dynamic dependencies and compile the frontend
+    #     /fstiva-app.sh
         
-        # 2. Tell PM2 to gracefully reload the processes with the new files
-        pm2 reload backend
-        pm2 reload Frontend
+    #     # 2. Tell PM2 to gracefully reload the processes with the new files
+    #     pm2 reload backend
+    #     pm2 reload Frontend
