@@ -27,14 +27,31 @@ const getUserEvents = async (req, res) => {
 
 // buy event function
 const buyEvent = async (req, res) => {
-    const { title, date, location, description, price, imagekey } = req.body;
+    const { eventId, title, date, location, description, price, imagekey } = req.body;
     try {
-        const event = await Userevent.create({userId: req.user.id, title, date, location, description, price, purchased: true, purchasedate: new Date(), imagekey });
+        const event = await Userevent.create({userId: req.user.id, eventId, title, date, location, description, price, purchased: true, purchasedate: new Date(), imagekey, qty: 1});
         res.status(201).json(event);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+// update quantity function
+const updateQty = async(req, res) => {
+    const { qty } = req.body;
+    try {
+        const event = await Userevent.findById(req.params.id);
+        if (!event) return res.status(404).json({ message: 'Event not found' });
+        // if (event.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Unauthorized' });
+        
+        event.qty = qty || event.qty;
+        const updatedEvent = await event.save();
+        res.json(updatedEvent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+};
+};
+
 // cancel event function
 const cancelUserEvent = async (req, res) => {
     try {
@@ -49,4 +66,4 @@ const cancelUserEvent = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-module.exports = { getAllEvents, getUserEvents, buyEvent, cancelUserEvent };
+module.exports = { getAllEvents, getUserEvents, buyEvent, updateQty, cancelUserEvent };
