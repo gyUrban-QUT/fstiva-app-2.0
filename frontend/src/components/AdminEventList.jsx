@@ -95,6 +95,7 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
                     )}
                 <button
                   onClick={() => {
+                    setSelectedId(event._id)
                     setShowConfirmationPopup(true);
                   }}
                   className="p-2 rounded font-semibold text-black hover:opacity-80"
@@ -107,7 +108,7 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
                     isOpen={showConfirmationPopup}
                     onClose={() => setShowConfirmationPopup(false)}
                     onConfirm={() => {
-                      handleDelete(event._id);
+                      handleDelete(selectedId);
                       setShowConfirmationPopup(false);
                     }}
                     title="Confirm Deletion"

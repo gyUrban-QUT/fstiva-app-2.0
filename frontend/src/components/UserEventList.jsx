@@ -12,16 +12,19 @@ import Empty from '../assets/emptycart.svg';
 import UserFindEvents from '../components/UserFindEvents';
 import { getEventImage } from '../assets/eventImages';
 import ConfirmationPopup from '../components/ConfirmationPopup';
+import { FaPlus, FaMinus } from "react-icons/fa"; //+ and - icons for quantity
+import SuccessPopup from '../components/SuccessPopup'; //popup window for transaction success
 
 
-const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) => {
+const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) => {
   const { user } = useAuth(); // Get current user for auth token
-  
+  const [selectedId, setSelectedId] = useState(null); // Track which event is interacted with
   const [showUserFindEvents, setShowUserFindEvents] = useState(false);
-
     // handles popup for cancel confirmation
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
-  
+  const [changedQty, setChangedQty] = useState(null); //track if qty changes
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
   useEffect(() => {
       const fetchEvents = async () => {
         try {
@@ -35,28 +38,84 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
       };
 
       fetchEvents();
-    }, [user]);
+    }, [user, setEvents]);
 
   // Handles cancelling a reservation by deleting the event via API
-  const handleDelete = async (event) => {
-    // const eventToDelete = events.find((event) => event._id === eventId);
+  const handleDelete = async (eventId) => {
+    const eventToDelete = events.find((event) => event._id === eventId);
     // const confirmDelete = window.confirm('Are you sure you want to cancel this reservation?');
     // if (!confirmDelete) return;
     try {
-      await axiosInstance.delete(`/api/userevents/${event._id}`, {
+      await axiosInstance.delete(`/api/userevents/${eventToDelete._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       // Remove the deleted event from local state
-       setEvents((prevEvents) => prevEvents.filter((e) => e._id !== event._id));
+       setEvents((prevEvents) => prevEvents.filter((e) => e._id !== eventToDelete._id));
     } catch (error) {
       alert('Failed to cancel reservation.');
     }
   };
+
   // add new reservation to list of events after successful reservation
   const handleReserved = (newReservation) => {
     setEvents((prevEvents) => [...prevEvents, newReservation]);
   };
 
+  // convert ticket price to numeric to allow for multiplication
+  function numericPrice(stringPrice) {
+      const numericString = stringPrice.replace(/[^0-9.-]/g, '');
+      return parseFloat(numericString) || 0;
+  };
+  // function to limit qty to between 1 and 10
+  function limitQty(num){
+    const MIN = 1;
+    const MAX = 10;
+    const parsed = parseInt(num)
+    return Math.min(Math.max(parsed, MIN), MAX)
+  };
+  
+  // increment function
+  function incrementQty(qty) {
+    const qtyNum = parseFloat(qty)||0;
+    return limitQty(qtyNum + 1)
+  };
+
+    // reduce function
+  function reduceQty(qty) {
+    const qtyNum = parseFloat(qty)||0;
+    return limitQty(qtyNum - 1)
+  };
+
+  // another solution
+  // const [eventQty, setEventQty] = useState([]);
+  const handleAdd = (eventId) => {
+    setEvents(events => events.map(
+      event => event._id === eventId
+      ? {...event, qty: incrementQty(event.qty??1)} : event
+    ));
+  };
+
+  const handleReduce = (eventId) => {
+    setEvents(events => events.map(
+      event => event._id === eventId
+      ? {...event, qty: reduceQty(event.qty??1)} : event
+    ));
+  };
+
+  const handleUpdate = async (eventId) => {
+    
+    const eventToUpdate = events.find((event) => event._id === eventId);
+    // const confirmDelete = window.confirm('Are you sure you want to cancel this reservation?');
+    // if (!confirmDelete) return;
+    try {
+      await axiosInstance.patch(`/api/userevents/${eventToUpdate._id}`, {
+        qty: eventToUpdate.qty
+      }, {headers: { Authorization: `Bearer ${user.token}` }});
+    } catch (error) {
+      alert('Failed to update reservation.');
+    };
+    setSelectedId(null); //reset selected ID once update processed
+  };
 
 
 
@@ -95,33 +154,88 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
           <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
             <h2 className="font-bold text-white break-words">{event.title}</h2>
           </div>
-          <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">
             Date: {event.date}
           </p>
           </div>
-          <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">{event.location}</p>
           </div>
-          <div className="w-4/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-3/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">{event.description}</p>
           </div>
-          <div className="w-96 border p-2" style={{ borderColor: '#121212' }}>
-          <p className="text-white break-words">Tickets from: {event.price}</p>
+          <div className="w-sm border p-2" style={{ borderColor: '#121212' }}>
+          <p className="text-white break-words">Ticket price: ${numericPrice(event.price) * event.qty??1 }</p>
           </div>
-
+          <div className="flex flex-row items-start gap-2 w-md border p-2" style={{ borderColor: '#121212' }}>
+            <button>
+              <FaMinus color='#F08B00' size='1rem'
+              onClick={() => {
+                  // setSelectedId(event._id);
+                  handleReduce(event._id);
+                  setChangedQty(event._id);
+                }}/>
+              
+            </button>
+          <p className="text-white break-words text-base">{event.qty??1}</p>
+            <button>
+              <FaPlus color='#F08B00' size='1rem'
+              // {/* Update button - shown when card is clicked */}
+              onClick={() => {
+                  // setSelectedId(event._id);
+                  handleAdd(event._id);
+                  setChangedQty(event._id);
+                }}
+                />
+            </button>
+          </div>
           {/* Action buttons */}
-          <div className=" border p-2" style={{ borderColor: '#121212' }}>
-            <div className="mt-2 flex gap-8">
-              {/* <button
-                onClick={() => setEditingEvent(event)}
-                className="p-2 rounded font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#F08B00' }}
-              >
-                Edit Reservation
-              </button> */}
+          <div className="flex flex-col border p-2" style={{ borderColor: '#121212' }}>
+            
+            
+           {changedQty === event._id && ( 
+            <div className="mt-2 flex-col gap-8">
+          <button
+            onClick={async () => {
+              
+              setSelectedId(event._id); 
+              
+              try {
+                // 1. Wait for the update to finish successfully
+                await handleUpdate(event._id); 
+                
+                // 2. Trigger your popup here after successful resolution
+                setShowSuccessPopup(true);
+                
+              } catch (error) {
+                console.error("Update failed", error);
+              }
+            }}
+            className="p-2 rounded font-semibold text-black hover:opacity-80"
+            style={{ backgroundColor: '#097c26' }}
+          >
+            Update Reservation
+          </button>
+          <SuccessPopup
+                    isOpen={showSuccessPopup}
+                    onClose={() => setShowSuccessPopup(false)}
+                    onConfirm={() => {
+                      setShowSuccessPopup(false);
+                      setSelectedId(null);
+                      setChangedQty(null);
+                    }}
+                    title="Confirm Update"
+                    message="Event Updated Successfully"
+                  />
+                  </div>
+            )}
+                
+                
+              <div className="mt-2 flex-col gap-8">
               <button
                 onClick={() => {
+                  setSelectedId(event._id)
                   setShowConfirmationPopup(true);
                 }}
                 className="p-2 rounded font-semibold text-black hover:opacity-80"
@@ -133,7 +247,7 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent }) =
                     isOpen={showConfirmationPopup}
                     onClose={() => setShowConfirmationPopup(false)}
                     onConfirm={() => {
-                      handleDelete(event);
+                      handleDelete(selectedId);
                       setShowConfirmationPopup(false);
                     }}
                     title="Confirm Cancellation"

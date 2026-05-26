@@ -29,3 +29,17 @@ Both users and administrators can update their profile and securely change their
 * **MongoDB Account** [[https://account.mongodb.com/account/login](https://account.mongodb.com/account/login)]** - 
 
 ---
+**To run app on your local environment (for development purposes only):**
+* Clone Git Repository
+* Install dependencies 
+* Install npm
+* Start app
+
+---
+**Contribute to app via Git**
+* git branch <feature_branch> develop
+* git checkout <feature_branch>
+* git add <your changes>
+* git commit -m "JIRA-ID: short description"
+* git push origin <feature_branch>
+* Pull requests into main must be approved by repo owner(s)

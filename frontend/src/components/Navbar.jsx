@@ -23,15 +23,21 @@ const Navbar = () => {
 
   return (
     <nav className="text-white p-4 flex items-center gap-4" style={{ backgroundColor: '#311B3D' }}>
-      <Link to="/" className="text-2xl font-bold flex items-center">
+      {/* <Link to="/" className="text-2xl font-bold flex items-center">
         <img src={Logo} alt="Logo" className="h-8 w-8 mr-2" />
         Fstiva App
-      </Link>
-      <div className="flex-1 justify-end flex items-center gap-4">
+      </Link> */}
+      
         {/* user Navbar */}
         {user ? (
+          
           user.role === 'admin' ? ( 
             <>
+            <Link to="/adminpage" className="text-2xl font-bold flex items-center">
+              <img src={Logo} alt="Logo" className="h-8 w-8 mr-2" />
+              Fstiva App
+            </Link>
+          <div className="flex-1 justify-end flex items-center gap-4">
             <div className="flex items-center justify-end w-full">
               <div style={{ display: 'flex', gap: '10px' }}>
                 <Link to="/adminpage" className="mr-4">
@@ -48,10 +54,15 @@ const Navbar = () => {
                 </div>
               </div>
               </div>
+            </div>
             </>
           ) : (
             <>
-
+            <Link to="/userpage" className="text-2xl font-bold flex items-center">
+              <img src={Logo} alt="Logo" className="h-8 w-8 mr-2" />
+              Fstiva App
+            </Link>
+          <div className="flex-1 justify-end flex items-center gap-4">
               
             <div className="flex items-center justify-end w-full">
               
@@ -71,12 +82,16 @@ const Navbar = () => {
                 </div>
               </div>
               </div>
-              
+            </div>  
             </>
           )
         ) : (
           <>
-            {/* <Link to="/login" className="mr-4">Login</Link> */}
+            <Link to="/" className="text-2xl font-bold flex items-center">
+              <img src={Logo} alt="Logo" className="h-8 w-8 mr-2" />
+              Fstiva App
+            </Link>
+          <div className="flex-1 justify-end flex items-center gap-4">
             <Link
               to="/register"
               className="px-4 py-2 rounded hover:opacity-80"
@@ -84,9 +99,10 @@ const Navbar = () => {
             >
               Register
             </Link>
+            </div>
           </>
         )}
-      </div>
+      
     </nav>
   );
 };
