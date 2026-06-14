@@ -1,0 +1,61 @@
+$kind: http-request
+url: http://localhost:5001/api/auth/login
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"naha@qut.edu.au\",\r
+
+    \    \"password\": \"naha\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "// Parse the response body\r
+
+      let response = pm.response.json();\r
+
+      // Basic test: status code should be 200\r
+
+      pm.test(\"Status code is 200\", function () {\r
+
+      pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Body matches string\", function () {\r
+
+      pm.expect(pm.response.text()).to.include(\"name\");\r
+
+      });\r
+
+      pm.test(\"Content-Type is present\", function () {\r
+
+      pm.response.to.have.header(\"Content-Type\");\r
+
+      });\r
+
+      pm.test(\"Response time is less than 200ms\", function () {\r
+
+      pm.expect(pm.response.responseTime).to.be.below(200);\r
+
+      });\r
+
+      // Save JWT token to environment variable (adjust key as needed)\r
+
+      if (response.token) {\r
+
+      pm.environment.set(\"jwt_token\", response.token);\r
+
+      console.log(\"JWT Token saved to environment\");\r
+
+      } else {\r
+
+      console.warn(\"No token found in response!\");\r
+
+      }"
+    language: text/javascript
+order: 3406231255106773

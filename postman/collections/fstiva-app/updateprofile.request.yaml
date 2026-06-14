@@ -1,0 +1,55 @@
+$kind: http-request
+name: updateprofile
+url: http://localhost:5001/api/auth/profile
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{jwt_token}}
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"naha@qut.edu.au\",\r
+
+    \    \"password\": \"naha\",\r
+
+    \    \"name\": \"another name\",\r
+
+    \    \"dateofbirth\": \"01/01/2001\",\r
+
+    \    \"role\": \"admin\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "// Parse the response body\r
+
+      let response = pm.response.json();\r
+
+      // Basic test: status code should be 200\r
+
+      pm.test(\"Status code is 200\", function () {\r
+
+      pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Body matches string\", function () {\r
+
+      pm.expect(pm.response.text()).to.include(\"name\");\r
+
+      });\r
+
+      pm.test(\"Content-Type is present\", function () {\r
+
+      pm.response.to.have.header(\"Content-Type\");\r
+
+      });\r
+
+      pm.test(\"Response time is less than 200ms\", function () {\r
+
+      pm.expect(pm.response.responseTime).to.be.below(200);\r
+
+      });\r\n"
+    language: text/javascript
+order: 4487025173536932

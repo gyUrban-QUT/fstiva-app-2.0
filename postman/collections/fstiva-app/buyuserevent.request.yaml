@@ -1,0 +1,8 @@
+$kind: http-request
+name: buyuserevent
+url: http://localhost:5001/api/userevents
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{jwt_token}}
+order: 4500394779478137

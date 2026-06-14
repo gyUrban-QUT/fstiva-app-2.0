@@ -1,0 +1,8 @@
+$kind: http-request
+name: getuserevents
+url: http://localhost:5001/api/userevents
+method: GET
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{jwt_token}}
+order: 4503540439473302
