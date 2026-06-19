@@ -2,14 +2,20 @@ import { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import { getEventImage } from '../assets/eventImages';
-
+import { useNavigate } from 'react-router-dom';
+import { reserveUserEvent} from '../services/userEventService'
 
 const UserFindEvents = ({  onClose, onReserved }) => {
+  const navigate = useNavigate();
+
   const { user } = useAuth();
   const [allEvents, setAllEvents] = useState([]);  
   const [loading, setLoading] = useState(true); 
   const [submittingId, setSubmittingId] = useState(null);
-
+  const handleOpenDetails = (eventId) => {
+    onClose();
+    navigate('/events/' + eventId);
+  };
    useEffect(() => {
    const fetchAllEvents = async () => {
       try {
@@ -33,25 +39,9 @@ const UserFindEvents = ({  onClose, onReserved }) => {
     try {
       setSubmittingId(event._id);
 
-      const response = await axiosInstance.post(
-        '/api/userevents',
-        { eventId: event._id,
-          title: event.title,
-          date: event.date,
-          location: event.location,
-          description: event.description,
-          price: event.price,
-          purchased: true,
-          purchaseDate: new Date().toISOString(),
-          imagekey: event.imagekey,
-          qty: 1,
-        },
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
+      const reserved = await reserveUserEvent({ event, token: user.token });
 
-      onReserved(response.data);
+      onReserved(reserved);
       onClose();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to reserve event.');
@@ -93,6 +83,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
               key={event._id}
               className="mb-4 rounded-2xl border-2 p-4 w-full"
               style={{ borderColor: '#272727', backgroundColor: '#272727' }}
+              onClick={() => handleOpenDetails(event._id)}
             >
               <div className="flex flex-row items-start gap-8 w-full px-4">
                 <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
@@ -123,9 +114,13 @@ const UserFindEvents = ({  onClose, onReserved }) => {
                   <button
                     className="rounded p-2 font-semibold text-black hover:opacity-80 disabled:opacity-50"
                     style={{ backgroundColor: '#F08B00' }}
-                    onClick={() => {handleReserve(event);
+                    onClick={(e) => {e.stopPropagation();
+                                      handleReserve(event);
+                      // (e) => 
+                    }
                   // window.location.reload(); // Refreshes the current page
-                }}
+                
+              }
                     disabled={submittingId === event._id}
                   >
                     {submittingId === event._id ? 'Reserving...' : 'Reserve'}

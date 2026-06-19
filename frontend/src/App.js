@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Userpage from './pages/Userpage';
 import Adminpage from './pages/Adminpage';
+import EventDetailsPage from './pages/EventDetailsPage';
 
 
 function App() {
@@ -19,6 +20,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/userpage" element={<Userpage />} />
         <Route path="/adminpage" element={<Adminpage />} />
+        <Route path="/events/:id" element={<EventDetailsPage />} />
+
       </Routes>
     </Router>
   );
