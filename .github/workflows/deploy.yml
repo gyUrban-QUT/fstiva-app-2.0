@@ -1,21 +1,21 @@
-name: Backend CI - Dev
+name: Backend CI - Live
 
 on:
   push:
     branches:
-      - develop # Trigger CI on pushes to the development branch
+      - main # Trigger CI on pushes to the main production branch
 
 jobs:
   test:
-    name: Run Tests & Deploy Dev
+    name: Run Tests & Deploy Live
     runs-on: self-hosted
 
     strategy:
       matrix:
         node-version: [22]
 
-    # Explicitly maps to a GitHub environment if you want to use environment-specific secrets
-    environment: development 
+    # Maps to production environment secrets
+    environment: production 
 
     steps:
     - name: Checkout Code
@@ -33,7 +33,7 @@ jobs:
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        PORT: 4000 # Hardcoded or use secrets.DEV_PORT to isolate from Live
+        PORT: 3000 # Production port
       run: | 
         echo "Secret 1 is: $MONGO_URI"
         echo "Secret 2 is: $JWT_SECRET"
@@ -62,14 +62,19 @@ jobs:
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        PORT: 4000 # Runs tests on the dev port
+        PORT: 3000 # Runs tests on the production port
       working-directory: ./backend
       run: npm test
 
-    # Safely start/restart ONLY the dev process without touching the production app
-    # If the app is using an ecosystem.config.js file, specify it. Otherwise, this targets the process name.
-    # We pass the DEV port (4000) directly into the runtime execution context.
-    name: Start or Reload Dev Application
-    run: |
-      PORT=4000 pm2 reload react-dev-app || PORT=4000 pm2 start ./backend/server.js --name "react-dev-app"
-      pm2 save
+    # CRITICAL NEW STEP: Sync built production files to the dedicated Live folder
+    - name: Sync Production Code to Live App Directory
+      run: |
+        mkdir -p ~/www/live-app
+        rsync -avz --delete ./ ~/www/live-app/
+
+    # Safely start/restart ONLY the live process on port 3000
+    - name: Start or Reload Live Application
+      run: |
+        cd ~/www/live-app
+        PORT=3000 pm2 reload react-live-app || PORT=3000 pm2 start ./backend/server.js --name "react-live-app"
+        pm2 save
