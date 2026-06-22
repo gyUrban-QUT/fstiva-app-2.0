@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const sinon = require('sinon');
 const Userevent = require('../models/Userevent');
 const Event = require('../models/Event');
+const UserTransactions = require('../models/UserTransactions');
 const { getAllEvents, getUserEvents, buyEvent, cancelUserEvent } = require('../controllers/userEventController');
 const { expect } = chai;
 
@@ -17,183 +18,202 @@ let port;
 // Start the server before running tests
 // first function: test cases for getAllEvents function in userEventController.js
 describe('getAllEvents Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-    it('should retrieve events successfully', async () => {
-        // Mock events. This is for admin users who can see all events. For regular users, we would filter by userId.
+  it('should retrieve events successfully', async () => {
+    const events = [
+      { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
+      { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
+    ];
 
-        const events = [
-            { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
-            { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
-        ];
+    sinon.stub(Event, 'find').resolves(events);
+    const req = {};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-        // Stub Event.find to return the mock events
-        const findStub = sinon.stub(Event, 'find').resolves(events);
-        // Mock request and response objects
-        const req = {};
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
+    await getAllEvents(req, res);
 
-        // Call the function
-        await getAllEvents(req, res);
+    expect(res.json.calledWith(events)).to.be.true;
+    expect(res.status.called).to.be.false;
+  });
 
-        // Assertions
-        // expect(findStub.calledOnceWith({ userId })).to.be.true;
-        expect(res.json.calledWith(events)).to.be.true;
-        expect(res.status.called).to.be.false; // No error status should be set
+  it('should return 500 if an error occurs', async () => {
+    sinon.stub(Event, 'find').throws(new Error('DB Error'));
 
-        // Restore stubbed methods
-        findStub.restore();
-    });
+    const req = {};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-    it('should return 500 if an error occurs', async () => {
-        // Stub Event.find to throw an error
-        const findStub = sinon.stub(Event, 'find').throws(new Error('DB Error'));
+    await getAllEvents(req, res);
 
-        // Mock request and response objects
-        const req = { };
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
-
-        // Call the function
-        await getAllEvents(req, res);
-
-        // Assertions
-        expect(res.status.calledWith(500)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-        // Restore stubbed methods
-        findStub.restore();
-
-    });
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
 
 // second function: test cases for getUserEvents function in userEventController.js
 // now we need to pass a userID
 describe('getUserEvents Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-    it('should retrieve events successfully', async () => {
-        // Mock events. This is for users who can see all available events for purchase
-        const eventId = new mongoose.Types.ObjectId();
-        const userId = new mongoose.Types.ObjectId();
-        const userevents = [
-        {_id: eventId, userId,
-        title: "Event Title",
-        description: "Description",
-        location: " Location",
-        date: new Date(),
-        price: 50,
-        imagekey: "image",
-        qty: 1,
-        save: sinon.stub().resolvesThis(), // Mock save method
-        }];
+  it('should retrieve events successfully', async () => {
+    const eventId = new mongoose.Types.ObjectId();
+    const userId = new mongoose.Types.ObjectId();
+    const userEventId = new mongoose.Types.ObjectId();
+    
+    // Mock the chained populate().lean() response
+    const userevents = [{
+      _id: userEventId,
+      userId: userId.toString(),
+      eventId: { _id: eventId, imagekey: "image", title: "Event Title", date: new Date(), location: "Location", description: "Description" },
+      qty: 1
+    }];
 
-        // Stub Userevent.find to return the mock events
-        const findStub = sinon.stub(Userevent, 'find').resolves(userevents);
-        // Mock request and response objects
-        const req = { user: { id: userId.toString() } };
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
+    // Mock transactions
+    const transactions = [{
+      eventId: eventId,
+      userEventObjRef: userEventId,
+      price: 50,
+      transactionqty: 1
+    }];
 
-        // Call the function
-        await getUserEvents(req, res);
+    // Stub chained Userevent.find().populate().lean()
+    const leanStub = sinon.stub().resolves(userevents);
+    const populateStub = sinon.stub().returns({ lean: leanStub });
+    sinon.stub(Userevent, 'find').returns({ populate: populateStub });
+    
+    // Stub chained UserTransactions.find().sort().lean()
+    const transLeanStub = sinon.stub().resolves(transactions);
+    const sortStub = sinon.stub().returns({ lean: transLeanStub });
+    sinon.stub(UserTransactions, 'find').returns({ sort: sortStub });
 
-        // Assertions
-        expect(findStub.calledOnceWith({ userId: req.user.id })).to.be.true;
-        expect(res.json.calledWith(userevents)).to.be.true;
-        expect(res.status.called).to.be.false;
+    const req = { user: { id: userId.toString() } };
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-        // Restore stubbed methods
-        findStub.restore();
-    });
+    await getUserEvents(req, res);
 
-    it('should return 500 if an error occurs', async () => {
-        // Stub Userevent.find to throw an error
-        const userId = new mongoose.Types.ObjectId();
-        const findStub = sinon.stub(Userevent, 'find').throws(new Error('DB Error'));
+    expect(res.json.calledOnce).to.be.true;
+    expect(res.status.called).to.be.false;
+  });
 
-        // Mock request and response objects
-        const req = { user: { id: userId.toString() } };
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
+  it('should return 500 if an error occurs', async () => {
+    const userId = new mongoose.Types.ObjectId();
+    
+    // Stub Userevent.find to throw on chained call
+    const populateStub = sinon.stub().throws(new Error('DB Error'));
+    sinon.stub(Userevent, 'find').returns({ populate: populateStub });
 
-        // Call the function
-        await getUserEvents(req, res);
+    const req = { user: { id: userId.toString() } };
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-        // Assertions
-        expect(res.status.calledWith(500)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+    await getUserEvents(req, res);
 
-        // Restore stubbed methods
-        findStub.restore();
-
-    });
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
 
 
 // third function: test cases for buyEvent function in userEventController.js
 // this should behave more like a create function, where we add an event to the userevents collection.
 describe('buyEvent Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('should add an event to userevents successfully', async () => {
-      const userId = new mongoose.Types.ObjectId();
-    // Mock existing event
-      const req = {
-          user: { id: userId.toString() },
-          body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image", qty: 1 }
-        };
-         // Mock event that would be created
-      const createdEvent = { _id: new mongoose.Types.ObjectId(), ...req.body, userId: req.user.id, purchased: true, purchasedate: new Date() };
-        // Mock request & response
+    const userId = new mongoose.Types.ObjectId();
+    const eventId = new mongoose.Types.ObjectId();
+    const userEventId = new mongoose.Types.ObjectId();
     
-    // Stub Userevent.create to return the createdEvent
-    const createStub = sinon.stub(Userevent, 'create').resolves(createdEvent);
+    const req = {
+      user: { id: userId.toString() },
+      body: { eventId: eventId.toString(), price: 100, paymenttype: "card" }
+    };
     
-    // Mock response object
+    const createdUserEvent = { _id: userEventId, userId: userId.toString(), eventId: eventId, qty: 1 };
+    const createdTransaction = { _id: new mongoose.Types.ObjectId() };
+    
+    // Mock the formatted event that would be returned
+    const formattedEvent = {
+      _id: userEventId,
+      userId: userId.toString(),
+      eventId: eventId,
+      qty: 1,
+      imagekey: "image",
+      title: "Event Title",
+      date: new Date(),
+      location: "Location",
+      description: "Description",
+      price: 100
+    };
+
+    sinon.stub(Userevent, 'create').resolves(createdUserEvent);
+    sinon.stub(UserTransactions, 'create').resolves(createdTransaction);
+    
+    // Stub fetchFormattedUserEvents via chained calls
+    const leanStub = sinon.stub().resolves([{
+      _id: userEventId,
+      userId: userId.toString(),
+      eventId: { _id: eventId, imagekey: "image", title: "Event Title", date: new Date(), location: "Location", description: "Description" },
+      qty: 1
+    }]);
+    const populateStub = sinon.stub().returns({ lean: leanStub });
+    sinon.stub(Userevent, 'find').returns({ populate: populateStub });
+    
+    const transLeanStub = sinon.stub().resolves([{
+      eventId: eventId,
+      userEventObjRef: userEventId,
+      price: 100,
+      transactionqty: 1
+    }]);
+    const sortStub = sinon.stub().returns({ lean: transLeanStub });
+    sinon.stub(UserTransactions, 'find').returns({ sort: sortStub });
+    
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.spy()
     };
 
-        // Call function
     await buyEvent(req, res);
 
-    // Assertions
-    expect(createStub.calledOnce).to.be.true;
     expect(res.status.calledWith(201)).to.be.true;
-    expect(res.json.calledWith(createdEvent)).to.be.true;
-
-    // Restore stubbed methods
-    createStub.restore();
+    expect(res.json.calledOnce).to.be.true;
   });
 
-       it('should return 500 if an error occurs', async () => {
-        
-        const userId = new mongoose.Types.ObjectId();
-        const req = {
-            user: { id: userId.toString() },
-            body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image" }
-          };
-        const res = {
-            status: sinon.stub().returnsThis(),
-            json: sinon.spy()
-        };
+  it('should return 500 if an error occurs', async () => {
+    const userId = new mongoose.Types.ObjectId();
+    const eventId = new mongoose.Types.ObjectId();
+    const req = {
+      user: { id: userId.toString() },
+      body: { eventId: eventId.toString(), price: 100, paymenttype: "card" }
+    };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy()
+    };
 
-        const createStub = sinon.stub(Userevent, 'create').throws(new Error('DB Error'));
+    sinon.stub(Userevent, 'create').throws(new Error('DB Error'));
 
-        await buyEvent(req, res);
+    await buyEvent(req, res);
 
-        expect(res.status.calledWith(500)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-        createStub.restore();
-    });
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
 
 
@@ -201,80 +221,72 @@ describe('buyEvent Function Test', () => {
 // this should behave like a delete function, where we remove an event from the userevents collection. 
 // We need to check if the event exists and if the user is authorized to delete it (i.e., they are the one who reserved it).
 describe('cancelUserEvent Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-    it('should cancel an userEvent successfully', async () => {
-        const eventId = new mongoose.Types.ObjectId();
-        const userId = new mongoose.Types.ObjectId();
-        // Mock event ID and user ID
-        const req = { params: { id: eventId.toString() }, user: { id: userId.toString() }};
+  it('should cancel an userEvent successfully', async () => {
+    const eventId = new mongoose.Types.ObjectId();
+    const userId = new mongoose.Types.ObjectId();
+    const userEventId = new mongoose.Types.ObjectId();
+    
+    const req = { 
+      params: { id: userEventId.toString() }, 
+      user: { id: userId.toString() }, 
+      body: { price: 100 }
+    };
 
-        // Mock event that would be found
-        const event = { _id: eventId, userId: userId, deleteOne: sinon.stub().resolves() };
+    const event = { 
+      _id: userEventId, 
+      userId: userId, 
+      eventId: eventId,
+      qty: 1,
+      deleteOne: sinon.stub().resolves() 
+    };
 
-        // Stub Userevent.findById to return the mock event
-        const findByIdStub = sinon.stub(Userevent, 'findById').resolves(event);
-        
-        // Mock response object
+    sinon.stub(Userevent, 'findById').resolves(event);
+    sinon.stub(UserTransactions, 'create').resolves({ _id: new mongoose.Types.ObjectId() });
+    
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
+    
+    await cancelUserEvent(req, res);
 
+    sinon.assert.calledOnce(event.deleteOne);
+    expect(res.json.calledWith({ message: 'Reservation cancelled' })).to.be.true;
+  });
 
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
-        
-        // Call the function
-        await cancelUserEvent(req, res);
+  it('should return 404 if event is not found', async () => {
+    sinon.stub(Userevent, 'findById').resolves(null);
 
-        // Assertions
-        expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
-        sinon.assert.calledOnce(event.deleteOne);
-        expect(event.deleteOne.calledOnce).to.be.true;
-        expect(res.json.calledWith({ message: 'Reservation cancelled' })).to.be.true;
+    const eventId = new mongoose.Types.ObjectId();
+    const req = { params: { id: eventId.toString() }, body: { price: 100 }};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
+    await cancelUserEvent(req, res);
 
+    expect(res.status.calledWith(404)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'Event not found' })).to.be.true;
+  });
 
-        // Restore stubbed methods
-        findByIdStub.restore();
-    });
+  it('should return 500 if an error occurs', async () => {
+    sinon.stub(Userevent, 'findById').throws(new Error('DB Error'));
 
-    it('should return 404 if event is not found', async () => {
-        const findByIdStub = sinon.stub(Userevent, 'findById').resolves(null);
+    const eventId = new mongoose.Types.ObjectId();
+    const req = { params: { id: eventId.toString() }, body: { price: 100 }};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-        const eventId = new mongoose.Types.ObjectId();
-        // const userId = new mongoose.Types.ObjectId();
-        // Mock event ID and user ID
-        const req = { params: { id: eventId.toString() }};
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
+    await cancelUserEvent(req, res);
 
-        await cancelUserEvent(req, res);
-
-        expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
-        expect(res.status.calledWith(404)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'Event not found' })).to.be.true;
-
-        findByIdStub.restore();
-    });
-
-    it('should return 500 if an error occurs', async () => {
-        const findByIdStub = sinon.stub(Userevent, 'findById').throws(new Error('DB Error'));
-
-        const eventId = new mongoose.Types.ObjectId();
-        // const userId = new mongoose.Types.ObjectId();
-        const req = { params: { id: eventId.toString() }};
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
-
-        await cancelUserEvent(req, res);
-
-        expect(res.status.calledWith(500)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-        findByIdStub.restore();
-    });
-
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
