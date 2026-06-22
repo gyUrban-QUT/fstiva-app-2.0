@@ -47,10 +47,9 @@ jobs:
     # Install dependencies for backend
     - name: Install Backend Dependencies
       working-directory: ./backend
-      run: | 
        npm install --global yarn
        yarn --version
-       yarn install
+       yarn install --frozen-lockfile
       
     # Install dependencies for frontend
     - name: Install Frontend Dependencies
@@ -58,7 +57,7 @@ jobs:
       run: |
         df -h
         sudo rm -rf ./build
-        yarn install
+        yarn install --frozen-lockfile
         CI=''
         yarn run build
 
@@ -72,20 +71,9 @@ jobs:
       working-directory: ./backend
       run: npm test
 
-
-   # - run: npm ci
-    # - run: | 
-    #     cd ./backend
-    #     touch .env
-    #     echo "${{ secrets.PROD }}" > .env
-
     - run: pm2 start all
 
     - run: pm2 restart all
 
-    - name: Run Build Script and Restart Apps
-      run: |
-        
-        # 2. Tell PM2 to gracefully reload the processes with the new files
-        pm2 reload backend
-        pm2 reload Frontend
+    - name: Restart Applications
+      run: pm2 start all || pm2 reload all
