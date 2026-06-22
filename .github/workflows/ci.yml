@@ -22,6 +22,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
+      with:
+        clean: false  # Prevents Git from deleting your untracked .env file
 
     # Set up Node.js
     - name: Setup Node.js
