@@ -116,9 +116,9 @@ const UserFindEvents = ({  onClose, onReserved }) => {
                     style={{ backgroundColor: '#F08B00' }}
                     onClick={(e) => {e.stopPropagation();
                                       handleReserve(event);
-                      // (e) => 
+                    
                     }
-                  // window.location.reload(); // Refreshes the current page
+                  
                 
               }
                     disabled={submittingId === event._id}
