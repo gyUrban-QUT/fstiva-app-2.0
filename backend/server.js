@@ -4,7 +4,7 @@ dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-
+const path = require('path');
 
 const app = express();
 
@@ -19,6 +19,14 @@ if (require.main === module) {
     connectDB();
     // If the file is run directly, start the server
     const PORT = process.env.PORT || 5001;
+    // 1. Tell your backend where your frontend build files live
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+    // 2. Serve the index.html for any layout or page requests
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+    });
+
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   }
 
