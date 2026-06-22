@@ -47,6 +47,7 @@ jobs:
     # Install dependencies for backend
     - name: Install Backend Dependencies
       working-directory: ./backend
+      run: |
        npm install --global yarn
        yarn --version
        yarn install --frozen-lockfile
