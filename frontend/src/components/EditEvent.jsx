@@ -145,7 +145,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
         const response = await axiosInstance.put('/api/events/'+editingEvent._id, payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setEvents(events.map((event) => (event._id === response.data._id ? response.data : event)));
+        setEvents(events.map((event) => (event._id === response.data.event._id ? response.data.event : event)));
       } else {
         const response = await axiosInstance.post('/api/events', payload, {
           headers: { Authorization: `Bearer ${user.token}` },

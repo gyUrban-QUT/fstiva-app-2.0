@@ -14,6 +14,7 @@ import { getEventImage } from '../assets/eventImages';
 import ConfirmationPopup from '../components/ConfirmationPopup';
 import { FaPlus, FaMinus } from "react-icons/fa"; //+ and - icons for quantity
 import SuccessPopup from '../components/SuccessPopup'; //popup window for transaction success
+import numericPrice from '../utils/functions.js';
 
 
 const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) => {
@@ -45,9 +46,11 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
     const eventToDelete = events.find((event) => event._id === eventId);
     // const confirmDelete = window.confirm('Are you sure you want to cancel this reservation?');
     // if (!confirmDelete) return;
+    
     try {
       await axiosInstance.delete(`/api/userevents/${eventToDelete._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
+        data: { price: numericPrice(eventToDelete.price) }
       });
       // Remove the deleted event from local state
        setEvents((prevEvents) => prevEvents.filter((e) => e._id !== eventToDelete._id));
@@ -61,11 +64,6 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
     setEvents((prevEvents) => [...prevEvents, newReservation]);
   };
 
-  // convert ticket price to numeric to allow for multiplication
-  function numericPrice(stringPrice) {
-      const numericString = stringPrice.replace(/[^0-9.-]/g, '');
-      return parseFloat(numericString) || 0;
-  };
   // function to limit qty to between 1 and 10
   function limitQty(num){
     const MIN = 1;
@@ -109,12 +107,20 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
     // if (!confirmDelete) return;
     try {
       await axiosInstance.patch(`/api/userevents/${eventToUpdate._id}`, {
-        qty: eventToUpdate.qty
+        qty: eventToUpdate.qty,
+        //unitPrice: numericPrice(eventToUpdate.price), 
+        paymenttype: 'default'  // get from user selection later
       }, {headers: { Authorization: `Bearer ${user.token}` }});
+      // Refetch events to get updated prices from server
+      const response = await axiosInstance.get('/api/userevents', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setEvents(response.data);
     } catch (error) {
       alert('Failed to update reservation.');
     };
     setSelectedId(null); //reset selected ID once update processed
+
   };
 
 
@@ -166,7 +172,8 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
             <p className="text-white break-words">{event.description}</p>
           </div>
           <div className="w-sm border p-2" style={{ borderColor: '#121212' }}>
-          <p className="text-white break-words">Ticket price: ${numericPrice(event.price) * event.qty??1 }</p>
+            <p className="text-white break-words">Ticket price: {event.price} </p>
+          {/* <p className="text-white break-words">Ticket price: ${numericPrice(event.price) * event.qty??1 }</p> */}
           </div>
           <div className="flex flex-row items-start gap-2 w-md border p-2" style={{ borderColor: '#121212' }}>
             <button>

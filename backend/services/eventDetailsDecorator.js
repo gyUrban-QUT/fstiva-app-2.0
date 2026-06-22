@@ -62,7 +62,7 @@ class PresentationDecorator extends EventDetailsDecorator {
     return {
       ...event,
       imageUrl: `/images/${event.imagekey}.png`,
-      displayPrice: ["Tickets from: ${event.price}"]
+      displayPrice: ["Tickets from: "+ event.price]
     };
   }
 }

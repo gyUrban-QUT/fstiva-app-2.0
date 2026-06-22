@@ -1,16 +1,10 @@
 import axiosInstance from '../axiosConfig';
+import numericPrice from '../utils/functions.js';
 
 export const mapEventToReservationPayload = (event, qty = 1, eventIdOverride = null) => ({
   eventId: eventIdOverride || event._id || event.eventId,  // Try override, then _id, then eventId
-  title: event.title,
-  date: event.date,
-  location: event.location,
-  description: event.description,
-  price: event.price,
-  purchased: true,
-  purchaseDate: new Date().toISOString(),
-  imagekey: event.imagekey,
-  qty,
+  qty: 1, price: numericPrice(event.price), paymenttype: 'default', transactiontype: 'B'
+
 });
 
 export const reserveUserEvent = async ({ event, token, qty = 1, eventId = null }) => {
