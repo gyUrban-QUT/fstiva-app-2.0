@@ -69,7 +69,7 @@ jobs:
     # Safely start/restart ONLY the dev process without touching the production app
     # If the app is using an ecosystem.config.js file, specify it. Otherwise, this targets the process name.
     # We pass the DEV port (4000) directly into the runtime execution context.
-    name: Start or Reload Dev Application
-    run: |
-      PORT=4000 pm2 reload react-dev-app || PORT=4000 pm2 start ./backend/server.js --name "react-dev-app"
-      pm2 save
+    - name: Start or Reload Dev Application
+      run: |
+        PORT=4000 pm2 reload react-dev-app || PORT=4000 pm2 start ./backend/server.js --name "react-dev-app"
+        pm2 save
