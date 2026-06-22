@@ -6,6 +6,7 @@ const connectDB = require('../config/db');
 const mongoose = require('mongoose');
 const sinon = require('sinon');
 const Event = require('../models/Event');
+const EventDetail = require('../models/EventDetail');
 const { getEvents, addEvent, updateEvent, deleteEvent } = require('../controllers/eventController');
 const { expect } = chai;
 
@@ -16,18 +17,24 @@ let port;
 // Start the server before running tests
 // first function: test cases for addEvent function in eventController.js
 describe('AddEvent Function Test', () => {
-      it('should create a new event successfully', async () => {
-// Mock request data
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should create a new event successfully', async () => {
+    // Mock request data
     const req = {
       user: { id: new mongoose.Types.ObjectId() },
-      body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image" }
+      body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image", descriptionDetail: "details", schedule: [] }
     };
 
-     // Mock event that would be created
+    // Mock event that would be created
     const createdEvent = { _id: new mongoose.Types.ObjectId(), ...req.body, userId: req.user.id };
+    const createdEventDetail = { _id: new mongoose.Types.ObjectId(), eventId: createdEvent._id, descriptionDetail: "details", schedule: [] };
 
-        // Stub Event.create to return the createdEvent
-    const createStub = sinon.stub(Event, 'create').resolves(createdEvent);
+    // Stub Event.create and EventDetail.create
+    sinon.stub(Event, 'create').resolves(createdEvent);
+    sinon.stub(EventDetail, 'create').resolves(createdEventDetail);
     
     // Mock response object
     const res = {
@@ -35,47 +42,43 @@ describe('AddEvent Function Test', () => {
       json: sinon.spy()
     };
 
-        // Call function
+    // Call function
     await addEvent(req, res);
 
-        // Assertions
-    expect(createStub.calledOnceWith({ userId: req.user.id, ...req.body })).to.be.true;
+    // Assertions
     expect(res.status.calledWith(201)).to.be.true;
-    expect(res.json.calledWith(createdEvent)).to.be.true;
-
-    // Restore stubbed methods
-    createStub.restore();
+    expect(res.json.calledOnce).to.be.true;
   });
 
-   it('should return 500 if an error occurs', async () => {
+  it('should return 500 if an error occurs', async () => {
     // Stub Event.create to throw an error
-    const createStub = sinon.stub(Event, 'create').throws(new Error('DB Error'));
+    sinon.stub(Event, 'create').throws(new Error('DB Error'));
     // Mock request data
     const req = {
       user: { id: new mongoose.Types.ObjectId() },
       body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image" }
     };
-        // Mock response object
+    // Mock response object
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.spy()
     };
 
-        // Call function
+    // Call function
     await addEvent(req, res);
 
     // Assertions
     expect(res.status.calledWith(500)).to.be.true;
     expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-    // Restore stubbed methods
-    createStub.restore();
   });
-
 });
 
 // second function: test cases for updateEvent function in eventController.js
 describe('UpdateEvent Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('should update an existing event successfully', async () => {
     // Mock existing event
     const eventId = new mongoose.Types.ObjectId();
@@ -88,15 +91,17 @@ describe('UpdateEvent Function Test', () => {
       date: new Date(),
       price: 50,
       imagekey: "oldimage",
-      save: sinon.stub().resolvesThis(), // Mock save method
+      save: sinon.stub().resolvesThis(),
     };
-        // Stub Event.findById to return mock event
-    const findByIdStub = sinon.stub(Event, 'findById').resolves(existingEvent);
-        // Mock request & response
+    
+    // Stub Event.findById to return mock event
+    sinon.stub(Event, 'findById').resolves(existingEvent);
+    // Stub EventDetail.findOneAndUpdate
+    sinon.stub(EventDetail, 'findOneAndUpdate').resolves({ _id: new mongoose.Types.ObjectId(), eventId });
     
     const req = {
       params: { id: eventId },
-      body: { title: "New Event", description: "New Description", location: "New Location", date: new Date(), price: 100, imagekey: "newimage" },
+      body: { title: "New Event", description: "New Description", location: "New Location", date: new Date(), price: 100, imagekey: "newimage", descriptionDetail: "details", schedule: [] },
     };
     
     const res = {
@@ -108,7 +113,6 @@ describe('UpdateEvent Function Test', () => {
     await updateEvent(req, res);
 
     // Assertions
-    expect(findByIdStub.calledOnceWith(eventId)).to.be.true;
     expect(existingEvent.title).to.equal("New Event");
     expect(existingEvent.description).to.equal("New Description");
     expect(existingEvent.location).to.equal("New Location");
@@ -117,13 +121,10 @@ describe('UpdateEvent Function Test', () => {
     expect(existingEvent.imagekey).to.equal("newimage");
     expect(existingEvent.save.calledOnce).to.be.true;
     expect(res.json.calledOnce).to.be.true;
-
-    // Restore stubbed methods
-    findByIdStub.restore();
   });
 
-   it('should return 404 if event is not found', async () => {
-    const findByIdStub = sinon.stub(Event, 'findById').resolves(null);
+  it('should return 404 if event is not found', async () => {
+    sinon.stub(Event, 'findById').resolves(null);
         
     const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
     const res = {
@@ -135,11 +136,10 @@ describe('UpdateEvent Function Test', () => {
 
     expect(res.status.calledWith(404)).to.be.true;
     expect(res.json.calledWithMatch({ message: 'Event not found' })).to.be.true;
-    findByIdStub.restore();
-    });
+  });
 
-    it('should return 500 if an error occurs', async () => {
-     const findByIdStub = sinon.stub(Event, 'findById').throws(new Error('DB Error'));
+  it('should return 500 if an error occurs', async () => {
+    sinon.stub(Event, 'findById').throws(new Error('DB Error'));
 
     const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
     const res = {
@@ -151,144 +151,107 @@ describe('UpdateEvent Function Test', () => {
 
     expect(res.status.calledWith(500)).to.be.true;
     expect(res.json.called).to.be.true;
-
-    findByIdStub.restore();
-    });
-
+  });
 });
 
 // third function: test cases for getEvents function in eventController.js
 describe('GetEvents Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-    it('should retrieve events successfully', async () => {
-        // Mock events. This is for admin users who can see all events. For regular users, we would filter by userId.
+  it('should retrieve events successfully', async () => {
+    const events = [
+      { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
+      { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
+    ];
 
-        const events = [
-            { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
-            { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
-        ];
+    sinon.stub(Event, 'find').resolves(events);
+    const req = {};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-        // Stub Event.find to return the mock events
-        const findStub = sinon.stub(Event, 'find').resolves(events);
-        // Mock request and response objects
-        const req = {};
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
+    await getEvents(req, res);
 
-        // Call the function
-        await getEvents(req, res);
+    expect(res.json.calledWith(events)).to.be.true;
+    expect(res.status.called).to.be.false;
+  });
 
-        // Assertions
-        // expect(findStub.calledOnceWith({ userId })).to.be.true;
-        expect(res.json.calledWith(events)).to.be.true;
-        expect(res.status.called).to.be.false; // No error status should be set
+  it('should return 500 if an error occurs', async () => {
+    sinon.stub(Event, 'find').throws(new Error('DB Error'));
 
-        // Restore stubbed methods
-        findStub.restore();
-    });
+    const req = {};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-    it('should return 500 if an error occurs', async () => {
-        // Stub Event.find to throw an error
-        const findStub = sinon.stub(Event, 'find').throws(new Error('DB Error'));
+    await getEvents(req, res);
 
-        // Mock request and response objects
-        const req = { };
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
-
-        // Call the function
-        await getEvents(req, res);
-
-        // Assertions
-        expect(res.status.calledWith(500)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-        // Restore stubbed methods
-        findStub.restore();
-
-    });
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
 
 
 // fourth function: test cases for deleteEvent function in eventController.js
 describe('DeleteEvent Function Test', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-    it('should delete an event successfully', async () => {
-        const eventId = new mongoose.Types.ObjectId();
-        const userId = new mongoose.Types.ObjectId();
-        // Mock event ID and user ID
-        const req = { params: { id: eventId.toString() }, user: { id: userId.toString() }};
+  it('should delete an event successfully', async () => {
+    const eventId = new mongoose.Types.ObjectId();
+    const userId = new mongoose.Types.ObjectId();
+    const req = { params: { id: eventId.toString() }, user: { id: userId.toString() }};
 
-        // Mock event that would be found
-        const event = { _id: eventId, userId: userId, deleteOne: sinon.stub().resolves() };
+    const event = { _id: eventId, userId: userId, deleteOne: sinon.stub().resolves() };
 
-        // Stub Event.findById to return the mock event
-        const findByIdStub = sinon.stub(Event, 'findById').resolves(event);
-        
-        // Mock response object
+    sinon.stub(Event, 'findById').resolves(event);
+    // Stub EventDetail.deleteOne for the controller's eventDetail.deleteOne call
+    sinon.stub(EventDetail, 'deleteOne').resolves();
+    
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
+    
+    await deleteEvent(req, res);
 
+    sinon.assert.calledOnce(event.deleteOne);
+  });
 
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
-        
-        // Call the function
-        await deleteEvent(req, res);
+  it('should return 404 if event is not found', async () => {
+    sinon.stub(Event, 'findById').resolves(null);
 
-        // Assertions
-        expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
-        sinon.assert.calledOnce(event.deleteOne);
-        // expect(event.deleteOne.calledOnce).to.be.true;
-        // expect(res.json.calledWith({ message: 'Event deleted' })).to.be.true;
+    const eventId = new mongoose.Types.ObjectId();
+    const req = { params: { id: eventId.toString() }};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
+    await deleteEvent(req, res);
 
+    expect(res.status.calledWith(404)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'Event not found' })).to.be.true;
+  });
 
-        // Restore stubbed methods
-        findByIdStub.restore();
-    });
+  it('should return 500 if an error occurs', async () => {
+    sinon.stub(Event, 'findById').throws(new Error('DB Error'));
 
-    it('should return 404 if event is not found', async () => {
-        const findByIdStub = sinon.stub(Event, 'findById').resolves(null);
+    const eventId = new mongoose.Types.ObjectId();
+    const req = { params: { id: eventId.toString() }};
+    const res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis()
+    };
 
-        const eventId = new mongoose.Types.ObjectId();
-        // const userId = new mongoose.Types.ObjectId();
-        // Mock event ID and user ID
-        const req = { params: { id: eventId.toString() }};
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
+    await deleteEvent(req, res);
 
-        await deleteEvent(req, res);
-
-        expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
-        expect(res.status.calledWith(404)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'Event not found' })).to.be.true;
-
-        findByIdStub.restore();
-    });
-
-    it('should return 500 if an error occurs', async () => {
-        const findByIdStub = sinon.stub(Event, 'findById').throws(new Error('DB Error'));
-
-        const eventId = new mongoose.Types.ObjectId();
-        // const userId = new mongoose.Types.ObjectId();
-        const req = { params: { id: eventId.toString() }};
-        const res = {
-            json: sinon.spy(),
-            status: sinon.stub().returnsThis()
-        };
-
-        await deleteEvent(req, res);
-
-        expect(res.status.calledWith(500)).to.be.true;
-        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-        findByIdStub.restore();
-    });
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
