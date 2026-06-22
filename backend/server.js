@@ -23,7 +23,7 @@ if (require.main === module) {
     app.use(express.static(path.join(__dirname, '../frontend/build')));
 
     // 2. Serve the index.html for any layout or page requests
-    app.get('*', (req, res) => {
+    app.get('*splat', (req, res) => {
       res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
     });
 
