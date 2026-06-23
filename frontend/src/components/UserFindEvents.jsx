@@ -15,7 +15,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
   const [submittingId, setSubmittingId] = useState(null);
 
   const handleOpenDetails = (eventId) => {
-    onClose();
+    if (onClose) onClose();
     navigate('/events/' + eventId);
   };
  
@@ -88,7 +88,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
               key={event._id}
               className="mb-4 rounded-2xl border-2 p-4 w-full"
               style={{ borderColor: '#272727', backgroundColor: '#272727' }}
-              onClick={() => handleOpenDetails(event._id)}
+              onClick={() => handleOpenDetails(event.id)}
             >
               <div className="flex flex-row items-start gap-8 w-full px-4">
                 <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
@@ -117,7 +117,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
                 
                 <div className="border p-2" style={{ borderColor: '#272727' }}>
                   
-                  {/* render teh conditional button */}
+                  {/* render the conditional button */}
                 {renderButton(submittingId, event, event.isBooked, handleReserve)} 
 
                 </div>
