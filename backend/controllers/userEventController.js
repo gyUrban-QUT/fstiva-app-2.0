@@ -3,6 +3,10 @@ const Event = require('../models/Event');
 const UserTransactions = require('../models/UserTransactions');
 const { Timestamp } = require('mongodb');
 const Fun = require('../utils/functions.js');
+const {
+  BaseEventDetails,
+  BookingStatusDecorator
+} = require('../services/eventDetailsDecorator');
 
 // Helper: fetch and format all user events for a user
 const fetchFormattedUserEvents = async (userId) => {
@@ -135,7 +139,27 @@ const getAllEvents = async (req, res) => {
     // 
     try {
         const allevents = await Event.find();
-        res.json(allevents);
+        // 2. Fetch current user's booked event IDs (if logged in)
+        let bookedEventIds = new Set();
+        // if (req.user.id) {
+        const userEvents = await Userevent.find({ userId: req.user.id }).select('eventId');
+        bookedEventIds = new Set(userEvents.map(b => b.eventId.toString()));
+
+        // }
+        // 3. Map through events and layer the decorations
+        const decoratedEvents = allevents.map(event => {
+            // Create base structure
+            let eventPipeline = new BaseEventDetails(event);
+
+            // Layer the user booking status dynamically
+            eventPipeline = new BookingStatusDecorator(eventPipeline, bookedEventIds);
+
+        // Execute the build chain
+        return eventPipeline.build();
+        
+        });
+        // console.log(decoratedEvents);
+        res.json(decoratedEvents);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
