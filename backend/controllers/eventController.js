@@ -130,7 +130,7 @@ const deleteEvent = async (req, res) => {
 
         await event.deleteOne({_id: req.params.id});
         // also delete details if event deleted
-        await eventDetail.deleteOne({_id: req.params.id});
+        await EventDetail.deleteOne({_id: req.params.id});
         
         res.json({ message: 'Event deleted' });
     } catch (error) {
