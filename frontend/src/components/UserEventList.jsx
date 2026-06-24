@@ -7,24 +7,26 @@
 
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import Empty from '../assets/emptycart.svg';
 import UserFindEvents from '../components/UserFindEvents';
 import { getEventImage } from '../assets/eventImages';
-import ConfirmationPopup from '../components/ConfirmationPopup';
-import { FaPlus, FaMinus } from "react-icons/fa"; //+ and - icons for quantity
-import SuccessPopup from '../components/SuccessPopup'; //popup window for transaction success
 import numericPrice from '../utils/functions.js';
+import { renderManageBookingModule } from './ManageBookingModule';
 
 
-const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) => {
+
+const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseEvent}) => {
+  const navigate = useNavigate();
+  const handleOpenDetails = (eventId) => {
+    if (onClose) onClose();
+    navigate('/events/' + eventId);
+  };
   const { user } = useAuth(); // Get current user for auth token
   const [selectedId, setSelectedId] = useState(null); // Track which event is interacted with
   const [showUserFindEvents, setShowUserFindEvents] = useState(false);
-    // handles popup for cancel confirmation
-  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
   const [changedQty, setChangedQty] = useState(null); //track if qty changes
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   useEffect(() => {
       const fetchEvents = async () => {
@@ -44,14 +46,14 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
   // Handles cancelling a reservation by deleting the event via API
   const handleDelete = async (eventId) => {
     const eventToDelete = events.find((event) => event._id === eventId);
-    // const confirmDelete = window.confirm('Are you sure you want to cancel this reservation?');
-    // if (!confirmDelete) return;
+
     
     try {
       await axiosInstance.delete(`/api/userevents/${eventToDelete._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
         data: { price: numericPrice(eventToDelete.price) }
       });
+       
       // Remove the deleted event from local state
        setEvents((prevEvents) => prevEvents.filter((e) => e._id !== eventToDelete._id));
     } catch (error) {
@@ -62,42 +64,6 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
   // add new reservation to list of events after successful reservation
   const handleReserved = (newReservation) => {
     setEvents((prevEvents) => [...prevEvents, newReservation]);
-  };
-
-  // function to limit qty to between 1 and 10
-  function limitQty(num){
-    const MIN = 1;
-    const MAX = 10;
-    const parsed = parseInt(num)
-    return Math.min(Math.max(parsed, MIN), MAX)
-  };
-  
-  // increment function
-  function incrementQty(qty) {
-    const qtyNum = parseFloat(qty)||0;
-    return limitQty(qtyNum + 1)
-  };
-
-    // reduce function
-  function reduceQty(qty) {
-    const qtyNum = parseFloat(qty)||0;
-    return limitQty(qtyNum - 1)
-  };
-
-  // another solution
-  // const [eventQty, setEventQty] = useState([]);
-  const handleAdd = (eventId) => {
-    setEvents(events => events.map(
-      event => event._id === eventId
-      ? {...event, qty: incrementQty(event.qty??1)} : event
-    ));
-  };
-
-  const handleReduce = (eventId) => {
-    setEvents(events => events.map(
-      event => event._id === eventId
-      ? {...event, qty: reduceQty(event.qty??1)} : event
-    ));
   };
 
   const handleUpdate = async (eventId) => {
@@ -116,6 +82,7 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setEvents(response.data);
+      setChangedQty(null); // Reset changed state after successful update
     } catch (error) {
       alert('Failed to update reservation.');
     };
@@ -146,124 +113,59 @@ const UserEventList = ({ events, setEvents, purchaseEvent, setPurchaseEvent}) =>
       {/* Map through each event and render an event card */}
       {events.length > 0 ? (
         events.map((event) => (
+          // add opening event details page functionality
+      <div
+          key={event._id}
+          className="mb-4 rounded-2xl border-0 p-0 w-full"
+          // style={{backgroundColor: '#272727' }}
+          onClick={() => handleOpenDetails(event.eventId)}
+        >
           <div
             key={event._id}
             
             className="rounded-2xl border-2 p-4 mb-4 w-full"
-            style={{ borderColor: '#F08B00', backgroundColor: '#121212' }}
+            style={{ borderColor: '#F08B00', backgroundColor: '#272727' }}
         >
           <div className="flex flex-row items-start gap-2 max-w-9xl px-8">
           {/* Event details */}
           <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
             <img src={getEventImage(event.imagekey)} alt={event.title} />
           </div>
-          <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-64 border-0 p-2" style={{ borderColor: '#121212' }}>
             <h2 className="font-bold text-white break-words">{event.title}</h2>
           </div>
-          <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-64 border-0 p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">
             Date: {event.date}
           </p>
           </div>
-          <div className="w-64 border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-64 border-0 p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">{event.location}</p>
           </div>
-          <div className="w-3/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-3/6 h-42 overflow-y-scroll border-0 p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">{event.description}</p>
           </div>
-          <div className="w-sm border p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-sm border-0 p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">Ticket price: {event.price} </p>
-          {/* <p className="text-white break-words">Ticket price: ${numericPrice(event.price) * event.qty??1 }</p> */}
           </div>
-          <div className="flex flex-row items-start gap-2 w-md border p-2" style={{ borderColor: '#121212' }}>
-            <button>
-              <FaMinus color='#F08B00' size='1rem'
-              onClick={() => {
-                  // setSelectedId(event._id);
-                  handleReduce(event._id);
-                  setChangedQty(event._id);
-                }}/>
-              
-            </button>
-          <p className="text-white break-words text-base">{event.qty??1}</p>
-            <button>
-              <FaPlus color='#F08B00' size='1rem'
-              // {/* Update button - shown when card is clicked */}
-              onClick={() => {
-                  // setSelectedId(event._id);
-                  handleAdd(event._id);
-                  setChangedQty(event._id);
-                }}
-                />
-            </button>
-          </div>
-          {/* Action buttons */}
-          <div className="flex flex-col border p-2" style={{ borderColor: '#121212' }}>
-            
-            
-           {changedQty === event._id && ( 
-            <div className="mt-2 flex-col gap-8">
-          <button
-            onClick={async () => {
-              
-              setSelectedId(event._id); 
-              
-              try {
-                // 1. Wait for the update to finish successfully
-                await handleUpdate(event._id); 
-                
-                // 2. Trigger your popup here after successful resolution
-                setShowSuccessPopup(true);
-                
-              } catch (error) {
-                console.error("Update failed", error);
-              }
-            }}
-            className="p-2 rounded font-semibold text-black hover:opacity-80"
-            style={{ backgroundColor: '#097c26' }}
-          >
-            Update Reservation
-          </button>
-          <SuccessPopup
-                    isOpen={showSuccessPopup}
-                    onClose={() => setShowSuccessPopup(false)}
-                    onConfirm={() => {
-                      setShowSuccessPopup(false);
-                      setSelectedId(null);
-                      setChangedQty(null);
-                    }}
-                    title="Confirm Update"
-                    message="Event Updated Successfully"
-                  />
-                  </div>
-            )}
-                
-                
-              <div className="mt-2 flex-col gap-8">
-              <button
-                onClick={() => {
-                  setSelectedId(event._id)
-                  setShowConfirmationPopup(true);
-                }}
-                className="p-2 rounded font-semibold text-black hover:opacity-80"
-                style={{ backgroundColor: '#F08B00' }}
-              >
-                Cancel Reservation
-              </button>
-              <ConfirmationPopup
-                    isOpen={showConfirmationPopup}
-                    onClose={() => setShowConfirmationPopup(false)}
-                    onConfirm={() => {
-                      handleDelete(selectedId);
-                      setShowConfirmationPopup(false);
-                    }}
-                    title="Confirm Cancellation"
-                    message="Are you sure you want to cancel this reservation?"
-                  />
-            </div>
-          </div>
+          {/* ManageBookingModule - quantity controls and action buttons */}
+          {renderManageBookingModule({
+            event,
+            qty: event.qty ?? 1,
+            onQtyChange: (newQty) => {
+              setEvents(events => events.map(
+                e => e._id === event._id ? {...e, qty: newQty} : e
+              ));
+              setChangedQty(event._id);
+            },
+            onUpdate: () => handleUpdate(event._id),
+            onCancel: () => handleDelete(event._id),
+            hasChanges: changedQty === event._id,
+            isUpdating: selectedId === event._id
+          })}
         </div>
         </div>
+      </div>
       ))) : (
         <div className="flex flex-col items-center justify-center">
           <div className="flex flex-col items-center justify-center gap-4">

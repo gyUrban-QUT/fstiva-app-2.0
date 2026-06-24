@@ -4,7 +4,9 @@ const ConfirmationPopup = ({ isOpen, onClose, onConfirm, title, message }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-sm"
+            onClick={(e) => e.stopPropagation()}
+      >
       <div className="w-full max-w-md p-6 bg-white rounded-xl shadow-2xl transform transition-all">
         <h3 className="text-xl font-bold text-gray-900">{title}</h3>
         <p className="mt-3 text-gray-600">{message}</p>

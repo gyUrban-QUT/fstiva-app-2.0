@@ -4,6 +4,7 @@ import axiosInstance from '../axiosConfig';
 import { getEventImage } from '../assets/eventImages';
 import { useNavigate } from 'react-router-dom';
 import { reserveUserEvent} from '../services/userEventService'
+import { renderButton} from '../components/ReserveButton'
 
 const UserFindEvents = ({  onClose, onReserved }) => {
   const navigate = useNavigate();
@@ -12,10 +13,12 @@ const UserFindEvents = ({  onClose, onReserved }) => {
   const [allEvents, setAllEvents] = useState([]);  
   const [loading, setLoading] = useState(true); 
   const [submittingId, setSubmittingId] = useState(null);
+
   const handleOpenDetails = (eventId) => {
-    onClose();
+    if (onClose) onClose();
     navigate('/events/' + eventId);
   };
+ 
    useEffect(() => {
    const fetchAllEvents = async () => {
       try {
@@ -32,9 +35,10 @@ const UserFindEvents = ({  onClose, onReserved }) => {
 
     if (user) {
       fetchAllEvents();
+      
     }
   }, [user]);
-  
+
   const handleReserve = async (event) => {
     try {
       setSubmittingId(event._id);
@@ -79,11 +83,12 @@ const UserFindEvents = ({  onClose, onReserved }) => {
           <p className="text-white">No events available right now.</p>
         ) : (
           allEvents.map((event) => (
+            
             <div
               key={event._id}
               className="mb-4 rounded-2xl border-2 p-4 w-full"
               style={{ borderColor: '#272727', backgroundColor: '#272727' }}
-              onClick={() => handleOpenDetails(event._id)}
+              onClick={() => handleOpenDetails(event.id)}
             >
               <div className="flex flex-row items-start gap-8 w-full px-4">
                 <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
@@ -109,24 +114,12 @@ const UserFindEvents = ({  onClose, onReserved }) => {
                 <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
                   <p className="text-white break-words">Tickets from: {event.price}</p>
                 </div>
-
-                <div className="border p-2" style={{ borderColor: '#272727' }}>
-                  <button
-                    className="rounded p-2 font-semibold text-black hover:opacity-80 disabled:opacity-50"
-                    style={{ backgroundColor: '#F08B00' }}
-                    onClick={(e) => {e.stopPropagation();
-                                      handleReserve(event);
-                    
-                    }
-                  
                 
-              }
-                    disabled={submittingId === event._id}
-                  >
-                    {submittingId === event._id ? 'Reserving...' : 'Reserve'}
-                    {/* {window.location.reload() // Refreshes the current page
-                    } */}
-                  </button>
+                <div className="border p-2" style={{ borderColor: '#272727' }}>
+                  
+                  {/* render the conditional button */}
+                {renderButton(submittingId, event, event.isBooked, handleReserve)} 
+
                 </div>
               </div>
             </div>

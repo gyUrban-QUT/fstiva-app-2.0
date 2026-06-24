@@ -23,23 +23,43 @@ describe('getAllEvents Function Test', () => {
   });
 
   it('should retrieve events successfully', async () => {
-    const events = [
-      { _id: new mongoose.Types.ObjectId(), title: "Event 1" },
-      { _id: new mongoose.Types.ObjectId(), title: "Event 2" }
-    ];
+  const userId = new mongoose.Types.ObjectId();
+  const eventId1 = new mongoose.Types.ObjectId();
+  const eventId2 = new mongoose.Types.ObjectId();
+  
+  const events = [
+    { _id: eventId1, title: "Event 1", date: new Date(), location: "Loc1", description: "Desc1", price: "$50", imagekey: "img1" },
+    { _id: eventId2, title: "Event 2", date: new Date(), location: "Loc2", description: "Desc2", price: "$75", imagekey: "img2" }
+  ];
+  
+  // User has booked eventId1
+  const userEvents = [{ eventId: eventId1 }];
 
-    sinon.stub(Event, 'find').resolves(events);
-    const req = {};
-    const res = {
-      json: sinon.spy(),
-      status: sinon.stub().returnsThis()
-    };
+  sinon.stub(Event, 'find').resolves(events);
+  
+  // Stub the chained Userevent.find().select()
+  const selectStub = sinon.stub().resolves(userEvents);
+  sinon.stub(Userevent, 'find').returns({ select: selectStub });
 
-    await getAllEvents(req, res);
+  const req = { user: { id: userId.toString() } };
+  const res = {
+    json: sinon.spy(),
+    status: sinon.stub().returnsThis()
+  };
 
-    expect(res.json.calledWith(events)).to.be.true;
-    expect(res.status.called).to.be.false;
-  });
+  await getAllEvents(req, res);
+
+  expect(res.json.calledOnce).to.be.true;
+  expect(res.status.called).to.be.false;
+  
+  // Verify decorated structure
+  const result = res.json.firstCall.args[0];
+  expect(result).to.be.an('array').with.lengthOf(2);
+  expect(result[0]).to.have.property('id');        // BaseEventDetails uses 'id' not '_id'
+  expect(result[0]).to.have.property('isBooked');  // BookingStatusDecorator adds this
+  expect(result[0].isBooked).to.be.true;           // First event is booked
+  expect(result[1].isBooked).to.be.false;          // Second event is not booked
+});
 
   it('should return 500 if an error occurs', async () => {
     sinon.stub(Event, 'find').throws(new Error('DB Error'));

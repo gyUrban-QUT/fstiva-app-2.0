@@ -67,9 +67,29 @@ class PresentationDecorator extends EventDetailsDecorator {
   }
 }
 
+// FA2-11: check if user has event booked
+class BookingStatusDecorator extends EventDetailsDecorator {
+  constructor(component, bookedEventIds) {
+    super(component);
+    // Pass a Set of IDs for O(1) fast lookups
+    this.bookedEventIds = bookedEventIds || new Set(); 
+  }
+
+  build() {
+    const event = super.build();
+    
+    return {
+      ...event,
+      // Convert ID to string to ensure matching works seamlessly
+      isBooked: this.bookedEventIds.has(event.id.toString()), 
+    };
+  }
+}
+
 module.exports = {
   BaseEventDetails,
   ScheduleDecorator,
   LongDescriptionDecorator,
   PresentationDecorator,
+  BookingStatusDecorator,
 };
