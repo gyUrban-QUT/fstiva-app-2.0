@@ -7,6 +7,7 @@ const {
   BaseEventDetails,
   BookingStatusDecorator
 } = require('../services/eventDetailsDecorator');
+const { pricingFactory } = require('../services/pricingStrategy');
 
 // Helper: fetch and format all user events for a user
 const fetchFormattedUserEvents = async (userId) => {
@@ -66,47 +67,7 @@ const fetchFormattedUserEvents = async (userId) => {
     });
 };
 
-/**
- * LIFO Refund Price Calculator
- * Processes transactions chronologically to track available slots correctly
- */
-const calculateLIFORefundPrices = async (userEventObjRef, qtyToCancel) => {
-    // Fetch all transactions OLDEST first (chronological order)
-    const transactions = await UserTransactions.find({ userEventObjRef })
-        .sort({ transactiondate: 1 })  // ascending - oldest first
-        .lean();
 
-    // Process chronologically, maintaining a stack of available slots
-    // Stack: newest at end (push/pop from end for LIFO)
-    let availableSlots = [];
-    
-    for (const tx of transactions) {
-        if (tx.transactiontype === 'B') {
-            // Purchase: add slots to stack
-            const qty = Math.abs(parseInt(tx.transactionqty));
-            const price = parseFloat(tx.price);
-            for (let i = 0; i < qty; i++) {
-                availableSlots.push({ price, date: tx.transactiondate });
-            }
-        } else if (tx.transactiontype === 'C') {
-            // Cancellation: remove slots from top of stack (LIFO)
-            const qty = Math.abs(parseInt(tx.transactionqty));
-            for (let i = 0; i < qty && availableSlots.length > 0; i++) {
-                availableSlots.pop();
-            }
-        }
-    }
-    
-    // Take from end (most recent) for this cancellation
-    const pricesToRefund = [];
-    for (let i = 0; i < qtyToCancel && availableSlots.length > 0; i++) {
-        pricesToRefund.push(availableSlots.pop().price);
-    }
-    
-    const totalRefund = pricesToRefund.reduce((sum, p) => sum + p, 0);
-
-    return { prices: pricesToRefund, totalRefund };
-};
 
 // get user events - now uses the helper
 const getUserEvents = async (req, res) => {
@@ -168,7 +129,7 @@ const getAllEvents = async (req, res) => {
 
 // update quantity function
 const updateQty = async (req, res) => {
-    const { qty, paymenttype } = req.body;  // do not send unit price, build into logic instead
+    const { qty, paymenttype } = req.body;
     try {
         const event = await Userevent.findById(req.params.id);
         if (!event) return res.status(404).json({ message: 'Event not found' });
@@ -180,25 +141,13 @@ const updateQty = async (req, res) => {
             return res.json({ event, message: 'No change' });
         }
 
-        let transactionPrice;
-        let transactionType;
-        let paymentType;
-
-        if (qtyDiff > 0) {
-            // INCREASE: fetch current price from Events data
-            const eventDet = await Event.findById(event.eventId);
-            transactionPrice = Fun.numericPrice(eventDet.price);
-            transactionType = 'B';
-            paymentType = 'default';
-        } else {
-            // DECREASE: use LIFO refund calculation
-            const qtyToCancel = Math.abs(qtyDiff);
-            const { totalRefund } = await calculateLIFORefundPrices(req.params.id, qtyToCancel);
-            // Store per-unit average for the transaction record
-            transactionPrice = totalRefund / qtyToCancel;
-            transactionType = 'C';
-            paymentType = 'NA';
-        }
+        // Use Strategy Pattern for pricing calculation
+        const strategy = pricingFactory.getStrategy(qtyDiff);
+        const { transactionPrice, transactionType, paymentType } = await strategy.calculate({
+            eventId: event.eventId,
+            userEventObjRef: req.params.id,
+            qtyDiff
+        });
         
         event.qty = qty;
         const updatedEvent = await event.save();
@@ -219,7 +168,6 @@ const updateQty = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 // cancel event function
 const cancelUserEvent = async (req, res) => {
     
