@@ -90,10 +90,8 @@ const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseE
 
   };
 
-
-
-  return (
-        <div className=" w-full flex-col items-center justify-center gap-12 mt-8"> 
+     return (
+        <div className="w-full flex-col items-center justify-center gap-12 mt-8 px-4 md:px-8"> 
           <div className={`mb-6 flex ${events.length > 0 ? 'justify-left' : 'justify-center'}`}>
             <button
               className="p-2 rounded font-semibold text-black hover:opacity-80"
@@ -123,29 +121,29 @@ const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseE
           <div
             key={event._id}
             
-            className="rounded-2xl border-2 p-4 mb-4 w-full"
+            className="flex flex-col md:flex-row rounded-2xl border-2 p-4 mb-4 w-full"
             style={{ borderColor: '#F08B00', backgroundColor: '#272727' }}
         >
-          <div className="flex flex-row items-start gap-2 max-w-9xl px-8">
+          <div className="flex flex-col md:flex-row items-start gap-2 w-full max-w-9xl px-4 md:px-8">
           {/* Event details */}
-          <div className="w-64 border p-2" style={{ borderColor: '#272727' }}>
+          <div className="w-full md:w-1/6 flex-shrink-0 border p-2" style={{ borderColor: '#272727' }}>
             <img src={getEventImage(event.imagekey)} alt={event.title} />
           </div>
-          <div className="w-64 border-0 p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-full md:w-1/12 flex-shrink-0 border-0 p-2" style={{ borderColor: '#121212' }}>
             <h2 className="font-bold text-white break-words">{event.title}</h2>
           </div>
-          <div className="w-64 border-0 p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-full md:w-1/12 flex-shrink-0 border-0 p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">
             Date: {event.date}
           </p>
           </div>
-          <div className="w-64 border-0 p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-full md:w-1/12 flex-shrink-0 border-0 p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">{event.location}</p>
           </div>
-          <div className="w-3/6 h-42 overflow-y-scroll border-0 p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-full md:w-2/6 md:h-42 md:overflow-y-scroll border-0 p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">{event.description}</p>
           </div>
-          <div className="w-sm border-0 p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-full md:w-auto flex-shrink-0 border-0 p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">Ticket price: {event.price} </p>
           </div>
           {/* ManageBookingModule - quantity controls and action buttons */}
@@ -167,9 +165,9 @@ const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseE
         </div>
       </div>
       ))) : (
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <div className="flex flex-col items-center justify-center gap-4">
-            <img src={Empty} alt="No reservations" className="w-64 h-64 mb-4 opacity-50" />
+            <img src={Empty} alt="No reservations" className="w-48 h-48 md:w-64 md:h-64 mb-4 opacity-50" />
             <p className="text-gray-400 text-lg">Nothing to see here ... for now.</p>
           </div>
             

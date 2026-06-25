@@ -42,7 +42,7 @@ const welcomeText = "Welcome to Fstiva!\nYour one-stop shop of global festivals.
             </div>    
         </div>
 
-      <div className="flex flex-col justify-start md:flex-row items-start gap-12 w-full max-w-9xl px-8">
+      <div className="flex flex-col justify-start flex-row md:flex-col items-start gap-12 w-full max-w-9xl px-8">
         <div className="flex-1 flex justify-start">
           <img src={Logo} alt="Logo" className="w-64 h-64 object-contain" />
           <img src={Picnic} alt="Picnic" className="w-64 h-64 object-contain" />
