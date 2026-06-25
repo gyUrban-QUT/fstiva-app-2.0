@@ -140,7 +140,7 @@ const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseE
           <div className="w-full md:w-1/12 flex-shrink-0 border-0 p-2" style={{ borderColor: '#121212' }}>
           <p className="text-white break-words">{event.location}</p>
           </div>
-          <div className="w-full md:w-2/6 md:h-42 md:overflow-y-scroll border-0 p-2" style={{ borderColor: '#121212' }}>
+          <div className="w-full md:w-2/6 h-42 overflow-y-scroll border-0 p-2" style={{ borderColor: '#121212' }}>
             <p className="text-white break-words">{event.description}</p>
           </div>
           <div className="w-full md:w-auto flex-shrink-0 border-0 p-2" style={{ borderColor: '#121212' }}>
