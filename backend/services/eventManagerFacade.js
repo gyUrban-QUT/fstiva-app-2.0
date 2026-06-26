@@ -18,7 +18,9 @@ class eventManagerFacade {
 
         // 2. Find all active bookings linked to this event
         const associatedBookings = await userEvent.find({ eventId: eventId }); // Fixed: userEvent
-        console.log(`[Facade] Found ${associatedBookings.length} associated user bookings to process.`);
+        // console.log(`[Facade] Found ${associatedBookings.length} associated user bookings to process.`);
+        const associatedBookingsCount = associatedBookings.length
+        let deletedBookingsCount = 0; // Initialize outside the if block
 
         // 3. Generate transaction logs for cancelled bookings
         if (associatedBookings.length > 0) {
@@ -39,11 +41,12 @@ class eventManagerFacade {
                 });
             });
             await Promise.all(transactionPromises);
-            console.log(`[Facade] Generated ${transactionPromises.length} refund transaction logs.`);
+            // console.log(`[Facade] Generated ${transactionPromises.length} refund transaction logs.`);
 
             // Delete all associated bookings
             const bookingResult = await userEvent.deleteMany({ eventId: eventId }); // Fixed: userEvent
-            console.log(`[Facade] Cancelled ${bookingResult.deletedCount} bookings.`);
+            // console.log(`[Facade] Cancelled ${bookingResult.deletedCount} bookings.`);
+            deletedBookingsCount = bookingResult.deletedCount
         }
 
         // Delete the event
@@ -53,7 +56,8 @@ class eventManagerFacade {
 
         return {
             deletedEvent: event,
-            processedBookingsCount: associatedBookings.length
+            processedBookingsCount: associatedBookingsCount,
+            deletedCount: deletedBookingsCount
         };
     }
 

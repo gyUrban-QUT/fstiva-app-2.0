@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const EventDetail = require('../models/EventDetail');
+const userEvent = require('../models/Userevent');
 const {
   BaseEventDetails,
   ScheduleDecorator,
@@ -119,4 +120,24 @@ const deleteEvent = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-module.exports = { getEvents, addEvent, updateEvent, deleteEvent, getEventDetails };
+
+// to get delete impact before actual deletion happens
+const getDeleteImpact = async (req, res) => {
+    try {
+        const eventId = req.params.id; // Extract eventId from route params
+
+        // 2. Find all active bookings linked to this event
+        const associatedBookings = await userEvent.find({ eventId: eventId }); 
+        const associatedBookingsCount = associatedBookings.length;
+        // Send JSON response
+        return res.status(200).json({ count: associatedBookingsCount });
+
+
+    } catch (error) {
+        if (error.message === 'Event not found') {
+            return res.status(404).json({ message: error.message });
+        }
+        return res.status(500).json({ message: error.message });
+    }
+};
+module.exports = { getEvents, addEvent, updateEvent, deleteEvent, getEventDetails, getDeleteImpact };
