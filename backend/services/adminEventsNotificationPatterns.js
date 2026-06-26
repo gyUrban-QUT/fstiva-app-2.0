@@ -1,5 +1,4 @@
 /**
- *
  * This file provides backend implementation evidence for:
  *   g. Observer Pattern for user notification
  *   h. Proxy Pattern for security check on admin events
