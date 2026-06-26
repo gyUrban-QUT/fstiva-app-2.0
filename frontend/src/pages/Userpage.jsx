@@ -38,7 +38,7 @@ const Userpage = () => {
 return null;
 };
   return (
-    <div className="h-screen w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#121212' }}>
+    <div className="min-h-screen p-8 w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#121212' }}>
       {/* Top of page - Logo and greeting */}
       <div className="flex flex-col justify-start md:flex-row items-start gap-6 w-full max-w-9xl px-8">
         <div className="flex-1 flex justify-start">

@@ -72,7 +72,7 @@ const Profile = () => {
   }
 
   return (
-<div className="h-screen w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#ffffff' }}>
+<div className="min-h-screen p-8 w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#ffffff' }}>
   <div className="flex flex-col justify-start md:flex-row items-start w-full max-w-9xl px-8">
         {/* Left side - Logo and greeting */}
      {/* Top of page - Logo and greeting */}

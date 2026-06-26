@@ -25,7 +25,8 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20">
+    <div className="min-h-screen p-8">
+      <div className="w-full md:w-1/6 md:min-w-[20rem] md:ml-auto justify-middle">
       <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
         <h1 className="text-2xl font-bold mb-4 text-center">Administrator Login</h1>
         <input
@@ -58,6 +59,7 @@ const AdminLogin = () => {
           Login
         </button>
       </form>
+    </div>
     </div>
   );
 };

@@ -43,7 +43,7 @@ if (!user) return <div className="text-center mt-20">Please log in.</div>;
         </div> */}
 
       
-<div className="w-full flex justify-center pt-12">
+<div className="min-h-screen p-8">
       <div className="flex flex-col items-center justify-center pt-12">
           <div className="flex flex-row items-start justify-start gap-12 w-full max-w-9xl px-8">
               <button
