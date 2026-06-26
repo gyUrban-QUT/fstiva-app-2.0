@@ -20,8 +20,25 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
 
   // handles popup for delete confirmation
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
+  const [message, setMessage] = useState('');
+  
   
   // const [loading, setLoading] = useState(false);
+  const handleCancelClick = async(eventId) => {
+    try {
+      const response = await axiosInstance.get(`/api/events/${eventId}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      // Extract count from response data
+      const deleteImpact = response.data.count;
+      // set confirmation message
+      setMessage(`Are you sure you want to proceed? This will cancel ${deleteImpact} associated bookings!`)
+      setShowConfirmationPopup(true);
+      // deletedCount --to do
+    } catch (error) {
+      alert('Failed to Retrieve Counts.');
+    }
+  };
 
   // Handles deleting an event via API
   const handleDelete = async (eventId) => {
@@ -29,7 +46,9 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
       await axiosInstance.delete(`/api/events/${eventId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
+      // const deletedCount = deletedEvent.data.deletedCount
       // Remove the deleted event from local state
+      // setTransactionConfMessage(`Event and ${deletedCount} associated bookings cancelled!`)
       setEvents(events.filter((event) => event._id !== eventId));
     } catch (error) {
       alert('Failed to delete event.');
@@ -96,7 +115,8 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
                 <button
                   onClick={() => {
                     setSelectedId(event._id)
-                    setShowConfirmationPopup(true);
+                    handleCancelClick(event._id);
+                    // setShowConfirmationPopup(true);
                   }}
                   className="p-2 rounded font-semibold text-black hover:opacity-80"
                   style={{ backgroundColor: '#F08B00' }}
@@ -110,9 +130,10 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
                     onConfirm={() => {
                       handleDelete(selectedId);
                       setShowConfirmationPopup(false);
+                      
                     }}
                     title="Confirm Deletion"
-                    message="Are you sure you want to delete this event?"
+                    message={message}
                   />
                 
               </div>
