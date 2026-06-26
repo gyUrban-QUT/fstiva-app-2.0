@@ -9,6 +9,8 @@ const Event = require('../models/Event');
 const EventDetail = require('../models/EventDetail');
 const { getEvents, addEvent, updateEvent, deleteEvent } = require('../controllers/eventController');
 const { expect } = chai;
+const eventManagerFacade = require('../services/eventManagerFacade'); 
+
 
 chai.use(chaiHttp);
 let server;
@@ -207,11 +209,12 @@ describe('DeleteEvent Function Test', () => {
     const userId = new mongoose.Types.ObjectId();
     const req = { params: { id: eventId.toString() }, user: { id: userId.toString() }};
 
-    const event = { _id: eventId, userId: userId, deleteOne: sinon.stub().resolves() };
-
-    sinon.stub(Event, 'findById').resolves(event);
-    // Stub EventDetail.deleteOne for the controller's eventDetail.deleteOne call
-    sinon.stub(EventDetail, 'deleteOne').resolves();
+    // Stub the facade method instead of individual models
+    const facadeResult = {
+      deletedEvent: { _id: eventId },
+      processedBookingsCount: 0
+    };
+    sinon.stub(eventManagerFacade, 'cancelEventBookings').resolves(facadeResult);
     
     const res = {
       json: sinon.spy(),
@@ -220,11 +223,14 @@ describe('DeleteEvent Function Test', () => {
     
     await deleteEvent(req, res);
 
-    sinon.assert.calledOnce(event.deleteOne);
+    expect(res.status.calledWith(200)).to.be.true;
+    expect(res.json.calledOnce).to.be.true;
+    expect(eventManagerFacade.cancelEventBookings.calledWith(eventId.toString())).to.be.true;
   });
 
   it('should return 404 if event is not found', async () => {
-    sinon.stub(Event, 'findById').resolves(null);
+    // Stub facade to throw 'Event not found' error
+    sinon.stub(eventManagerFacade, 'cancelEventBookings').rejects(new Error('Event not found'));
 
     const eventId = new mongoose.Types.ObjectId();
     const req = { params: { id: eventId.toString() }};
@@ -240,7 +246,7 @@ describe('DeleteEvent Function Test', () => {
   });
 
   it('should return 500 if an error occurs', async () => {
-    sinon.stub(Event, 'findById').throws(new Error('DB Error'));
+    sinon.stub(eventManagerFacade, 'cancelEventBookings').rejects(new Error('DB Error'));
 
     const eventId = new mongoose.Types.ObjectId();
     const req = { params: { id: eventId.toString() }};

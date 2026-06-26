@@ -1,13 +1,11 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const http = require('http');
-const app = require('../server'); 
-const connectDB = require('../config/db');
 const mongoose = require('mongoose');
 const sinon = require('sinon');
 const Userevent = require('../models/Userevent');
 const Event = require('../models/Event');
 const UserTransactions = require('../models/UserTransactions');
+const transactionService = require('../services/transactionService'); 
 const { getAllEvents, getUserEvents, buyEvent, cancelUserEvent } = require('../controllers/userEventController');
 const { expect } = chai;
 
@@ -89,7 +87,6 @@ describe('getUserEvents Function Test', () => {
     const userId = new mongoose.Types.ObjectId();
     const userEventId = new mongoose.Types.ObjectId();
     
-    // Mock the chained populate().lean() response
     const userevents = [{
       _id: userEventId,
       userId: userId.toString(),
@@ -97,23 +94,18 @@ describe('getUserEvents Function Test', () => {
       qty: 1
     }];
 
-    // Mock transactions
-    const transactions = [{
-      eventId: eventId,
-      userEventObjRef: userEventId,
-      price: 50,
-      transactionqty: 1
-    }];
-
-    // Stub chained Userevent.find().populate().lean()
+    // Stub Userevent.find().populate().lean()
     const leanStub = sinon.stub().resolves(userevents);
     const populateStub = sinon.stub().returns({ lean: leanStub });
     sinon.stub(Userevent, 'find').returns({ populate: populateStub });
     
-    // Stub chained UserTransactions.find().sort().lean()
-    const transLeanStub = sinon.stub().resolves(transactions);
-    const sortStub = sinon.stub().returns({ lean: transLeanStub });
-    sinon.stub(UserTransactions, 'find').returns({ sort: sortStub });
+    // Stub UserTransactions.find().lean() - used by calculatePaidTotals internally
+    const transLeanStub = sinon.stub().resolves([{
+      userEventObjRef: userEventId,
+      price: "50",
+      transactionqty: "1"
+    }]);
+    sinon.stub(UserTransactions, 'find').returns({ lean: transLeanStub });
 
     const req = { user: { id: userId.toString() } };
     const res = {
@@ -125,6 +117,9 @@ describe('getUserEvents Function Test', () => {
 
     expect(res.json.calledOnce).to.be.true;
     expect(res.status.called).to.be.false;
+    
+    const result = res.json.firstCall.args[0];
+    expect(result[0].price).to.equal(50);
   });
 
   it('should return 500 if an error occurs', async () => {
@@ -168,24 +163,11 @@ describe('buyEvent Function Test', () => {
     const createdUserEvent = { _id: userEventId, userId: userId.toString(), eventId: eventId, qty: 1 };
     const createdTransaction = { _id: new mongoose.Types.ObjectId() };
     
-    // Mock the formatted event that would be returned
-    const formattedEvent = {
-      _id: userEventId,
-      userId: userId.toString(),
-      eventId: eventId,
-      qty: 1,
-      imagekey: "image",
-      title: "Event Title",
-      date: new Date(),
-      location: "Location",
-      description: "Description",
-      price: 100
-    };
-
+    // Stub creates
     sinon.stub(Userevent, 'create').resolves(createdUserEvent);
     sinon.stub(UserTransactions, 'create').resolves(createdTransaction);
     
-    // Stub fetchFormattedUserEvents via chained calls
+    // Stub Userevent.find().populate().lean()
     const leanStub = sinon.stub().resolves([{
       _id: userEventId,
       userId: userId.toString(),
@@ -195,14 +177,13 @@ describe('buyEvent Function Test', () => {
     const populateStub = sinon.stub().returns({ lean: leanStub });
     sinon.stub(Userevent, 'find').returns({ populate: populateStub });
     
+    // Stub UserTransactions.find().lean() - used by calculatePaidTotals
     const transLeanStub = sinon.stub().resolves([{
-      eventId: eventId,
       userEventObjRef: userEventId,
-      price: 100,
-      transactionqty: 1
+      price: "100",
+      transactionqty: "1"
     }]);
-    const sortStub = sinon.stub().returns({ lean: transLeanStub });
-    sinon.stub(UserTransactions, 'find').returns({ sort: sortStub });
+    sinon.stub(UserTransactions, 'find').returns({ lean: transLeanStub });
     
     const res = {
       status: sinon.stub().returnsThis(),
@@ -211,6 +192,8 @@ describe('buyEvent Function Test', () => {
 
     await buyEvent(req, res);
 
+    expect(Userevent.create.calledOnce).to.be.true;
+    expect(UserTransactions.create.calledOnce).to.be.true;
     expect(res.status.calledWith(201)).to.be.true;
     expect(res.json.calledOnce).to.be.true;
   });

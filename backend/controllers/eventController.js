@@ -6,6 +6,7 @@ const {
   LongDescriptionDecorator,
   PresentationDecorator,
 } = require('../services/eventDetailsDecorator');
+const eventManagerFacade = require('../services/eventManagerFacade');
 
 // get events function
 const getEvents = async (req, res) => {
@@ -58,16 +59,6 @@ const addEvent = async (req, res) => {
     }
 };
 
-// add eventDetails function
-// const addEventDetail = async (req, res) => {
-//     const { descriptionDetail, schedule } = req.body;
-//     try {
-//         const event = await EventDetail.create({ userId: req.user.id, eventId: event._id, descriptionDetail, schedule });
-//         res.status(201).json(event);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
 // update event function
 const updateEvent = async (req, res) => {
     const { title, date, location, description, price, imagekey, descriptionDetail, schedule  } = req.body;
@@ -104,37 +95,28 @@ const updateEvent = async (req, res) => {
     }
 };
 
-// update eventDetails function
-// const updateEventDetail = async (req, res) => {
-//     const { descriptionDetail, schedule } = req.body;
-//     try {
-//         const event = await EventDetail.findById(req.params.id);
-//         if (!event) return res.status(404).json({ message: 'Event not found' });
-//         // if (event.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Unauthorized' });
-        
-//         event.descriptionDetail = descriptionDetail || event.descriptionDetail;
-//         event.schedule = schedule || event.schedule;
-//         const updatedEvent = await event.save();
-//         res.json(updatedEvent);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
+
 // delete event function
 // this is for admin and admin should be able to delete any event
 const deleteEvent = async (req, res) => {
     try {
-        const event = await Event.findById(req.params.id);
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-        // if (event.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Unauthorized' });
+        const eventId = req.params.id;
+        // const price = req.body.price || 0; // Capture price from body for transaction logs
+        console.log(eventId);
+        // call the Facade
+        const result = await eventManagerFacade.cancelEventBookings(eventId);
+        console.log(result);
+        return res.status(200).json({
+            success: true,
+            message: 'Event successfully deleted, reservations cancelled, and history logged.',
+            data: result
+        });
 
-        await event.deleteOne({_id: req.params.id});
-        // also delete details if event deleted
-        await EventDetail.deleteOne({_id: req.params.id});
-        
-        res.json({ message: 'Event deleted' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error.message === 'Event not found') {
+            return res.status(404).json({ message: error.message });
+        }
+        return res.status(500).json({ message: error.message });
     }
 };
 module.exports = { getEvents, addEvent, updateEvent, deleteEvent, getEventDetails };

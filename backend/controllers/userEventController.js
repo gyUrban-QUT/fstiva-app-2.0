@@ -8,52 +8,21 @@ const {
   BookingStatusDecorator
 } = require('../services/eventDetailsDecorator');
 const { pricingFactory } = require('../services/pricingStrategy');
+const { calculatePaidTotals } = require('../services/transactionService');
 
 // Helper: fetch and format all user events for a user
 const fetchFormattedUserEvents = async (userId) => {
     const userEvents = await Userevent.find({ userId })
         .populate('eventId', 'imagekey title date location description')
         .lean();
-    // console.log(userEvents);
-    const eventIds = userEvents.map((event) => event.eventId?._id).filter(Boolean);
-    
-    const transactions = await UserTransactions.find({
-        userId: userId,
-        eventId: { $in: eventIds },
-        //transactiontype: 'B',
-    })
-        .sort({ transactiondate: -1 })
-        .lean();
-    // console.log(transactions);
 
-    const totalPriceByUserEventId = transactions.reduce((prices, transaction) => {
-        const eventId = transaction.eventId.toString();
-        const userEventObjRef = transaction.userEventObjRef.toString();
-        // Create a unique composite string key
-        const compoundKey = `${eventId}_${userEventObjRef}`;
-        // 1. If this eventId hasn't been logged yet, initialise it at 0
-        if (!prices[compoundKey]) {
-            prices[compoundKey] = 0;
-        }
-        
-        // 2. Add the price to the running total (handles decimals safely if needed)
-        const transactionPrice = parseFloat(transaction.price) * parseFloat(transaction.transactionqty) || 0;
-        prices[compoundKey] += transactionPrice;
-        return prices;
-    }, {});
+    const bookingIds = userEvents.map(e => e._id);
+    const paidTotals = await calculatePaidTotals(bookingIds);
 
     return userEvents.map((userEvent) => {
         const event = userEvent.eventId || {};
-        const eventId = event._id?.toString();
-        // Ensure you match the property name exactly as it exists on userEvent
-        const userEventObjRef = (userEvent._id || '').toString(); 
-
-        // Generate the exact same composite key format for the lookup
-        const lookupKey = `${eventId}_${userEventObjRef}`;
-        
         return {
             _id: userEvent._id,
-            userEventObjRef: userEvent.userEventObjRef,
             userId: userEvent.userId,
             eventId: event._id,
             qty: userEvent.qty,
@@ -62,11 +31,10 @@ const fetchFormattedUserEvents = async (userId) => {
             date: event.date,
             location: event.location,
             description: event.description,
-            price: totalPriceByUserEventId[lookupKey],
+            price: paidTotals[userEvent._id.toString()] || 0,
         };
     });
 };
-
 
 
 // get user events - now uses the helper
