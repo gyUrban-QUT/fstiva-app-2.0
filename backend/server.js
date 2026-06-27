@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const express = require('express');
+const adminEventsNotificationPatternRoutes = require("./routes/adminEventsNotificationPatterns.routes");
 const cors = require('cors');
 const connectDB = require('./config/db');
 const path = require('path');
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/userevents', require('./routes/userEventRoutes'));
+app.use("/api", adminEventsNotificationPatternRoutes);
 
 // Export the app object for testing
 if (require.main === module) {
