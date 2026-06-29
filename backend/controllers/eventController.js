@@ -45,7 +45,7 @@ const getEventDetails = async (req, res) => {
 const addEvent = async (req, res) => {
     const { title, date, location, description, price, imagekey, descriptionDetail, schedule, startdate, enddate } = req.body;
     try {
-        const event = await Event.create({ userId: req.user.id, title, date, location, description, price, imagekey });
+        const event = await Event.create({ userId: req.user.id, title, date, location, description, price, imagekey, startdate, enddate });
         const normalisedSchedule = Array.isArray(schedule)?schedule:[];
         // 3. Create the event details using the new event's ID
         const eventDetail = await EventDetail.create({
