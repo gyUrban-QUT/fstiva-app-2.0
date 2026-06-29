@@ -1,9 +1,9 @@
 import axiosInstance from '../axiosConfig';
-import numericPrice from '../utils/functions.js';
+import fx from '../utils/functions.js';
 
 export const mapEventToReservationPayload = (event, qty = 1, eventIdOverride = null) => ({
   eventId: eventIdOverride || event._id || event.eventId || event.id,  // Try override, then _id, then eventId
-  qty: 1, price: numericPrice(event.price), paymenttype: 'default', transactiontype: 'B'
+  qty: 1, price: fx.numericPrice(event.price), paymenttype: 'default', transactiontype: 'B'
 
 });
 

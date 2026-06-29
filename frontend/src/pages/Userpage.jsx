@@ -25,7 +25,9 @@ const Userpage = () => {
         const response = await axiosInstance.get('/api/userevents', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setEvents(response.data);
+        console.log(response);
+        const sortedEvents = response.data.sort((a, b) => new Date(a.startdate) - new Date(b.startdate));
+        setEvents(sortedEvents);
       } catch (error) {
         alert(error.response?.data?.message || 'Failed to fetch events.');
       }

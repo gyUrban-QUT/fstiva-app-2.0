@@ -43,7 +43,7 @@ const getEventDetails = async (req, res) => {
 
 // add event function
 const addEvent = async (req, res) => {
-    const { title, date, location, description, price, imagekey, descriptionDetail, schedule } = req.body;
+    const { title, date, location, description, price, imagekey, descriptionDetail, schedule, startdate, enddate } = req.body;
     try {
         const event = await Event.create({ userId: req.user.id, title, date, location, description, price, imagekey });
         const normalisedSchedule = Array.isArray(schedule)?schedule:[];
@@ -62,7 +62,7 @@ const addEvent = async (req, res) => {
 
 // update event function
 const updateEvent = async (req, res) => {
-    const { title, date, location, description, price, imagekey, descriptionDetail, schedule  } = req.body;
+    const { title, date, location, description, price, imagekey, descriptionDetail, schedule, startdate, enddate  } = req.body;
     const normalisedSchedule = Array.isArray(schedule)?schedule:[];
     try {
         const event = await Event.findById(req.params.id);
@@ -75,6 +75,8 @@ const updateEvent = async (req, res) => {
         event.description = description || event.description;
         event.price = price || event.price;
         event.imagekey = imagekey || event.imagekey;
+        event.startdate = startdate || event.startdate;
+        event.enddate = enddate || event.enddate;
         const updatedEvent = await event.save();
 
         // 3. Update the associated event details
