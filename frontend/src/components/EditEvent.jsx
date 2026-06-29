@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import fx from '../utils/functions'
+import {DayPicker, TimePicker} from '../components/DropdownPicker';
 
 const EMPTY_SCHEDULE_ROW = { day: '', time: '', location: '', program: '', Details: ''};
 
@@ -297,7 +298,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
                   {formDetail.schedule.map((row, index) => (
                     <tr key={index}>
                     <td className="p-2 border">
-                        <input
+                        <DayPicker
                           type="text"
                           value={row.day}
                           onChange={(e) => updateScheduleCell(index, 'day', e.target.value)}
@@ -306,7 +307,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
                         />
                       </td>
                       <td className="p-2 border">
-                        <input
+                        <TimePicker
                           type="text"
                           value={row.time}
                           onChange={(e) => updateScheduleCell(index, 'time', e.target.value)}
