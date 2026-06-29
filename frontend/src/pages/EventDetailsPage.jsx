@@ -6,7 +6,7 @@ import { getEventImage } from '../assets/eventImages';
 import { useNavigate } from 'react-router-dom';
 import { reserveUserEvent } from '../services/userEventService';  // Add this import
 import { renderManageBookingModule } from '../components/ManageBookingModule';
-import numericPrice from '../utils/functions.js';
+import fx from '../utils/functions.js';
 
 const normalizeSchedule = (rawSchedule) => {
   if (Array.isArray(rawSchedule)) {
@@ -97,7 +97,7 @@ useEffect(() => {
   const handleCancel = async () => {
     await axiosInstance.delete(`/api/userevents/${userBooking._id}`, {
       headers: { Authorization: `Bearer ${user.token}` },
-      data: { price: numericPrice(userBooking.price) }
+      data: { price: fx.numericPrice(userBooking.price) }
     });
     setUserBooking(null);
     navigate('/userpage');

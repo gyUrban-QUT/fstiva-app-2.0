@@ -18,7 +18,8 @@ const AdminPage = () => {
         const response = await axiosInstance.get('/api/events', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setEvents(response.data);
+        const sortedEvents = response.data.toSorted((a, b) => new Date(a.startdate) - new Date(b.startdate));
+        setEvents(sortedEvents);
       } catch (error) {
         alert('Failed to fetch events.');
       }
