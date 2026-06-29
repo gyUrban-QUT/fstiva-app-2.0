@@ -173,7 +173,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100">
-      <div className="flex h-auto w-[1000px]">
+      <div className="flex flex-col md:flex-row w-full md:w-1/2 h-auto">
         <div className="bg-white p-6 rounded shadow-md w-full">
           <h2 className="text-2xl font-bold mb-4 text-center">
             {editingEvent ? 'Edit Event' : 'Add New Event'}

@@ -57,7 +57,7 @@ return null;
             
       </div>
 {/* middle of page: list of events booked by user */}
-      <div className="w-full flex justify-center pt-12 w-full">
+      <div className="w-full flex justify-center pt-12">
         <div className="rounded-2xl border-2 p-4 inline-block" 
           style={{ borderColor: '#121212', backgroundColor: '#121212'  }}>
           <UserEventList events={events} setEvents={setEvents} />
