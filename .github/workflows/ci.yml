@@ -18,6 +18,11 @@ jobs:
     environment: development 
 
     steps:
+    - name: Cleanup before build
+      run: |
+        yarn cache clean
+        rm -rf node_modules
+
     - name: Checkout Code
       uses: actions/checkout@v3
       with:
