@@ -8,6 +8,7 @@ const {
   BookingStatusDecorator
 } = require('../services/eventDetailsDecorator');
 const { pricingFactory } = require('../services/pricingStrategy');
+const { paymentFactory } = require('../services/paymentStrategy');
 const { calculatePaidTotals } = require('../services/transactionService');
 
 // Helper: fetch and format all user events for a user
@@ -47,12 +48,20 @@ const getUserEvents = async (req, res) => {
     }
 };
 
-// buy event - returns just the new event from the full list
+// buy event - now uses Factory + Strategy Pattern for payment processing
 const buyEvent = async (req, res) => {
     const { eventId, price, paymenttype } = req.body;
     try {
+        // Use Factory Pattern to get the correct payment Strategy based on user selection
+        const strategy = paymentFactory.getStrategy(paymenttype);
+        const { success, paymentType, transactionPrice } = await strategy.process({ price });
+
+        if (!success) {
+            return res.status(402).json({ message: 'Payment failed' });
+        }
+
         const userEvent = await Userevent.create({userId: req.user.id, eventId, qty: 1});
-        await UserTransactions.create({userEventObjRef: userEvent._id, userId: req.user.id, eventId, price, transactionqty: 1, transactiondate: new Date(), paymenttype, transactiontype: 'B'});
+        await UserTransactions.create({userEventObjRef: userEvent._id, userId: req.user.id, eventId, price: transactionPrice, transactionqty: 1, transactiondate: new Date(), paymenttype: paymentType, transactiontype: 'B'});
         
         const allEvents = await fetchFormattedUserEvents(req.user.id);
         const newEvent = allEvents.find(e => e._id.toString() === userEvent._id.toString());

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FaPlus, FaMinus } from "react-icons/fa";
 import ConfirmationPopup from './ConfirmationPopup';
 import SuccessPopup from './SuccessPopup';
+import PaymentMethodPopup from './PaymentMethodPopup';
 
 // Utility functions for quantity limits
 const limitQty = (num) => {
@@ -23,6 +24,7 @@ export const renderManageBookingModule = ({
   onUpdate,
   onCancel,
   onReserve,         // Add: reserve callback
+  onReserveComplete,
   hasChanges,
   isUpdating,
   isReserving        // Add: reserve loading state
@@ -36,6 +38,7 @@ export const renderManageBookingModule = ({
       onUpdate={onUpdate}
       onCancel={onCancel}
       onReserve={onReserve}
+      onReserveComplete={onReserveComplete}
       hasChanges={hasChanges}
       isUpdating={isUpdating}
       isReserving={isReserving}
@@ -58,6 +61,7 @@ const ManageBookingModule = ({
 }) => {
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [reservedData, setReservedData] = useState(null); // Store result until popup closes
 
@@ -74,14 +78,22 @@ const ManageBookingModule = ({
     }
   };
 
-  const handleReserveClick = async () => {
+  // STEP 1: Reserve button now opens the payment method popup, instead of reserving immediately
+  const handleReserveClick = () => {
+    setShowPaymentPopup(true);
+  };
+
+  // STEP 2: Called when user confirms their chosen payment method
+  const handlePaymentConfirm = async (paymentMethod) => {
     try {
-      const result = await onReserve();  // Returns the reserved data
-      setReservedData(result);           // Store it
+      const result = await onReserve(paymentMethod); // Pass method up to parent
+      setReservedData(result);
+      setShowPaymentPopup(false);
       setSuccessMessage('Event Reserved Successfully');
-      setShowSuccessPopup(true);         // Show popup BEFORE parent updates
+      setShowSuccessPopup(true);
     } catch (error) {
       console.error("Reserve failed", error);
+      setShowPaymentPopup(false);
     }
   };
 
@@ -155,6 +167,14 @@ const ManageBookingModule = ({
           </div>
         </>
       )}
+
+      {/* Payment method selection popup - shown before reservation is created */}
+      <PaymentMethodPopup
+        isOpen={showPaymentPopup}
+        onClose={() => setShowPaymentPopup(false)}
+        onConfirm={handlePaymentConfirm}
+        isProcessing={isReserving}
+      />
 
       {/* Single SuccessPopup outside conditionals - always mounted */}
       <SuccessPopup
