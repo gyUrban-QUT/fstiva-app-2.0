@@ -10,8 +10,10 @@
     "prod": "node server.js"
   },
   "dependencies": {
+    "artillery": "^2.0.33",
     "bcrypt": "^6.0.0",
     "chai-http": "4.4.0",
+    "child-process": "^1.0.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
