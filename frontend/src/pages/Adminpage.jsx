@@ -18,7 +18,8 @@ const AdminPage = () => {
         const response = await axiosInstance.get('/api/events', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setEvents(response.data);
+        const sortedEvents = response.data.toSorted((a, b) => new Date(a.startdate) - new Date(b.startdate));
+        setEvents(sortedEvents);
       } catch (error) {
         alert('Failed to fetch events.');
       }
@@ -28,7 +29,7 @@ const AdminPage = () => {
   }, [user]);
 if (!user) return <div className="text-center mt-20">Please log in.</div>;
   return (
-    <div className="min-h-screen flex flex-col items-start justify-top" style={{ backgroundColor: '#ffffff' }}>
+    <div className="min-h-screen p-8 w-full flex flex-col items-start justify-top" style={{ backgroundColor: '#ffffff' }}>
       {/* Top of page - Logo and greeting */}
         <div className="flex items-center gap-4">
           <img src={Logo} alt="Logo" className="w-48 h-48 object-contain" />
@@ -42,9 +43,8 @@ if (!user) return <div className="text-center mt-20">Please log in.</div>;
           </p>
         </div> */}
 
-      
-<div className="min-h-screen p-8">
-      <div className="flex flex-col items-center justify-center pt-12">
+
+      <div className="flex flex-col items-center justify-center pt-12 gap-12">
           <div className="flex flex-row items-start justify-start gap-12 w-full max-w-9xl px-8">
               <button
                 className="p-2 rounded font-semibold text-black hover:opacity-80"
@@ -63,7 +63,7 @@ if (!user) return <div className="text-center mt-20">Please log in.</div>;
                       />
                     )}
             </div>
-        <div className="flex flex-row items-start justify-start gap-12 w-full max-w-9xl px-8">
+        <div className="w-full flex justify-center pt-12">
         <div className="rounded-2xl border-2 p-4 inline-block" style={{ borderColor: '#ffffff', backgroundColor: '#ffffff'  }}>
           <AdminEventList 
             events={events} 
@@ -72,7 +72,7 @@ if (!user) return <div className="text-center mt-20">Please log in.</div>;
         </div> 
       </div>
      </div>
-     </div>
+
   );
 };
 

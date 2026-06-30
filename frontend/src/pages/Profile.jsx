@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import PhoneInput from 'react-phone-input-2/lib/lib.js';
 import 'react-phone-input-2/lib/style.css';
+import CountryPicker from '../components/CountryPicker';
 import Logo from '../assets/logo.png';
 import ChangePassword from '../components/ChangePassword';
 import Truck from '../assets/truck.png';
@@ -112,13 +113,23 @@ const Profile = () => {
           onChange={(e) => setFormData({ ...formData, dateofbirth: e.target.value })}
           className="w-full mb-4 p-2 border rounded"
         />
-        <input
+        {/* <label htmlFor="country"></label> */}
+        {/* Pass state and change handler into the picker */}
+         <CountryPicker 
+          type="text"
+          placeholder="Country"
+          value={formData.country} 
+          onChange={(e) => setFormData({ ...formData, country: e.target.value })} 
+        
+          className="w-full mb-4 p-2 border rounded"
+        /> 
+        {/* <input
           type="text"
           placeholder="Country"
           value={formData.country}
           onChange={(e) => setFormData({ ...formData, country: e.target.value })}
           className="w-full mb-4 p-2 border rounded"
-        />
+        /> */}
         <input
           type="text"
           placeholder="City"
@@ -130,7 +141,7 @@ const Profile = () => {
           country={'au'}
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e })}
-          className="w-full mb-4 p-2 border rounded"
+          className="w-full mb-4 p-2 border-0 rounded"
         />
         <input
           type="text"

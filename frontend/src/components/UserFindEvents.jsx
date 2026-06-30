@@ -29,7 +29,8 @@ const UserFindEvents = ({  onClose, onReserved }) => {
         const response = await axiosInstance.get('/api/userevents/all', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setAllEvents(response.data);
+        const sortedEvents = response.data.toSorted((a, b) => new Date(a.startdate) - new Date(b.startdate));
+        setAllEvents(sortedEvents);
       } catch (error) {
         alert(error.response?.data?.message || 'Failed to load events.');
       } finally {
