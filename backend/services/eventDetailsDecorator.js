@@ -12,6 +12,8 @@ class BaseEventDetails {
       description: this.event.description,
       price: this.event.price,
       imagekey: this.event.imagekey,
+      startdate: this.event.startdate,
+      enddate: this.event.enddate,
     };
   }
 }

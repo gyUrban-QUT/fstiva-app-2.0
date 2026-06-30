@@ -25,7 +25,9 @@ const Userpage = () => {
         const response = await axiosInstance.get('/api/userevents', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setEvents(response.data);
+        console.log(response);
+        const sortedEvents = response.data.sort((a, b) => new Date(a.startdate) - new Date(b.startdate));
+        setEvents(sortedEvents);
       } catch (error) {
         alert(error.response?.data?.message || 'Failed to fetch events.');
       }
@@ -57,7 +59,7 @@ return null;
             
       </div>
 {/* middle of page: list of events booked by user */}
-      <div className="w-full flex justify-center pt-12 w-full">
+      <div className="w-full flex justify-center pt-12">
         <div className="rounded-2xl border-2 p-4 inline-block" 
           style={{ borderColor: '#121212', backgroundColor: '#121212'  }}>
           <UserEventList events={events} setEvents={setEvents} />

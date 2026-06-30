@@ -14,7 +14,7 @@ const { calculatePaidTotals } = require('../services/transactionService');
 // Helper: fetch and format all user events for a user
 const fetchFormattedUserEvents = async (userId) => {
     const userEvents = await Userevent.find({ userId })
-        .populate('eventId', 'imagekey title date location description')
+        .populate('eventId', 'imagekey title date location description startdate enddate')
         .lean();
 
     const bookingIds = userEvents.map(e => e._id);
@@ -33,6 +33,8 @@ const fetchFormattedUserEvents = async (userId) => {
             location: event.location,
             description: event.description,
             price: paidTotals[userEvent._id.toString()] || 0,
+            startdate: event.startdate,
+            enddate: event.enddate,
         };
     });
 };

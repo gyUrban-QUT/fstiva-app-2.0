@@ -27,7 +27,10 @@ describe('AddEvent Function Test', () => {
     // Mock request data
     const req = {
       user: { id: new mongoose.Types.ObjectId() },
-      body: { title: "New Event", date: "2025-12-31", location: "Event location", description: "Event description", price: 100, imagekey: "image", descriptionDetail: "details", schedule: [] }
+      body: { title: "New Event", date: "2025-12-31", location: "Event location", 
+        description: "Event description", price: 100, imagekey: "image", 
+        startdate: "01-01-2026", enddate: "02-01-2026",
+        descriptionDetail: "details", schedule: [] }
     };
 
     // Mock event that would be created

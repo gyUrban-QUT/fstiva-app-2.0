@@ -56,35 +56,35 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
   };
 
   return (
-    <div>
+    <div className="w-full flex-col items-center justify-center gap-12 mt-8 px-4 md:px-8" >
       {/* Map through each event and render an event card */}
       {events.map((event) => (
         <div
           
           key={event._id}
           
-          className="rounded-2xl border-2 p-4 mb-4 cursor-pointer"
+          className="mb-4 rounded-2xl border-2 p-2 w-full cursor-pointer"
           style={{ borderColor: '#F08B00', backgroundColor: selectedId === event._id ? '#FFF3E0' : '#ffffff' }}
           onClick={() => setSelectedId(selectedId === event._id ? null : event._id)}
           >
-          <div className="flex flex-row items-start gap-8 w-full max-w-9xl px-8">
+          <div className="flex flex-col md:flex-row items-start gap-2 w-full max-w-9xl px-4 md:px-8">
           {/* Event details */}
-          <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-full md:w-1/6 flex-shrink-0 border p-2" style={{ borderColor: '#ffffff' }}>
             <img src={getEventImage(event.imagekey)} alt={event.title} />
           </div>
-          <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-full md:w-1/6 flex-shrink-0 border p-2" style={{ borderColor: '#ffffff' }}>
             <h2 className="font-bold text-black break-words">{event.title}</h2>
           </div>
-          <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-full md:w-1/12 flex-shrink-0 border-0 p-2" style={{ borderColor: '#ffffff' }}>
             <h2 className="font-bold text-black break-words">{event.date}</h2>
           </div>
-          <div className="w-64 border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-full md:w-1/12 flex-shrink-0 border-0 p-2" style={{ borderColor: '#ffffff' }}>
             <h2 className="font-bold text-black break-words">{event.location}</h2>
           </div>
-          <div className="w-3/6 h-36 overflow-y-scroll border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-full md:w-2/6 h-36 flex-shrink-0 overflow-y-scroll border-0 p-2" style={{ borderColor: '#ffffff' }}>
             <p className="text-black break-words">{event.description}</p>
           </div>
-          <div className="w-96 border p-2" style={{ borderColor: '#ffffff' }}>
+          <div className="w-full md:w-auto flex-shrink-0 border-0 p-2" style={{ borderColor: '#ffffff' }}>
           <p className="text-black break-words">
             Tickets from: {event.price}
           </p>
@@ -95,7 +95,7 @@ const AdminEventList = ({ events, setEvents, setEditingEvent }) => {
           {/* Action buttons - shown when card is clicked */}
           {selectedId === event._id && (
             <>
-              <div className="mt-3 flex gap-2 px-8" onClick={(e) => e.stopPropagation()}>
+              <div className="mt-3 flex gap-2 px-10" onClick={(e) => e.stopPropagation()}>
                 <button
                   className="p-2 rounded font-semibold text-black hover:opacity-80"
                   style={{ backgroundColor: '#F08B00' }}

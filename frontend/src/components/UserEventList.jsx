@@ -12,7 +12,7 @@ import axiosInstance from '../axiosConfig';
 import Empty from '../assets/emptycart.svg';
 import UserFindEvents from '../components/UserFindEvents';
 import { getEventImage } from '../assets/eventImages';
-import numericPrice from '../utils/functions.js';
+import fx from '../utils/functions.js';
 import { renderManageBookingModule } from './ManageBookingModule';
 
 
@@ -34,7 +34,8 @@ const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseE
           const response = await axiosInstance.get('/api/userevents', {
             headers: { Authorization: `Bearer ${user.token}` },
           });
-          setEvents(response.data);
+          const sortedEvents = response.data.toSorted((a, b) => new Date(a.startdate) - new Date(b.startdate));
+          setEvents(sortedEvents);
         } catch (error) {
           alert('Failed to fetch events.');
         }
@@ -51,7 +52,7 @@ const UserEventList = ({ onClose, events, setEvents, purchaseEvent, setPurchaseE
     try {
       await axiosInstance.delete(`/api/userevents/${eventToDelete._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
-        data: { price: numericPrice(eventToDelete.price) }
+        data: { price: fx.numericPrice(eventToDelete.price) }
       });
        
       // Remove the deleted event from local state

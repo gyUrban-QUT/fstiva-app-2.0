@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
+import fx from '../utils/functions'
+import {DayPicker, TimePicker} from '../components/DropdownPicker';
 
 const EMPTY_SCHEDULE_ROW = { day: '', time: '', location: '', program: '', Details: ''};
 
@@ -33,14 +35,17 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
     location: '',
     price: '',
     imagekey: '',
+    startdate: '',
+    enddate: '',
   });
 
   const [formDetail, setFormDetail] = useState({
     descriptionDetail: '',
     schedule: [{ ...EMPTY_SCHEDULE_ROW }],
   });
-
+// date range to be calculated
   useEffect(() => {
+
     if (editingEvent) {
       setFormData({
         title: editingEvent.title || '',
@@ -49,6 +54,8 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
         location: editingEvent.location || '',
         price: editingEvent.price || '',
         imagekey: editingEvent.imagekey || '',
+        startdate: editingEvent.startdate || '',
+        enddate: editingEvent.enddate || '',
       });
       setFormDetail({
         descriptionDetail: editingEvent.descriptionDetail || '',
@@ -62,6 +69,8 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
         location: '',
         price: '',
         imagekey: '',
+        startdate: '',
+        enddate: '',
       });
       setFormDetail({
         descriptionDetail: '',
@@ -135,17 +144,20 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
       .filter((row) => row.day || row.time || row.location || row.program || row.Details);
 
     const payload = {
-      ...formData,
-      descriptionDetail: formDetail.descriptionDetail,
-      schedule: cleanedSchedule,
-    };
+        ...formData,
+        date: fx.formatDisplayRange(formData.startdate, formData.enddate),  // Compute here
+        descriptionDetail: formDetail.descriptionDetail,
+        schedule: cleanedSchedule,
+      };
 
     try {
       if (editingEvent) {
         const response = await axiosInstance.put('/api/events/'+editingEvent._id, payload, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        setEvents(events.map((event) => (event._id === response.data.event._id ? response.data.event : event)));
+        setEvents(events.map((event) => (event._id === response.data.event._id ? response.data.event : event)
+      ));
+        
       } else {
         const response = await axiosInstance.post('/api/events', payload, {
           headers: { Authorization: `Bearer ${user.token}` },
@@ -161,6 +173,8 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
         location: '',
         price: '',
         imagekey: '',
+        startdate: '',
+        enddate: '',
       });
       setFormDetail({
         descriptionDetail: '',
@@ -173,7 +187,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100">
-      <div className="flex h-auto w-[1000px]">
+      <div className="flex flex-col md:flex-row w-full md:w-1/2 h-auto">
         <div className="bg-white p-6 rounded shadow-md w-full">
           <h2 className="text-2xl font-bold mb-4 text-center">
             {editingEvent ? 'Edit Event' : 'Add New Event'}
@@ -187,11 +201,36 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full mb-4 p-2 border rounded"
             />
+            <input 
+              type="date" 
+              id="start"
+              value={formData.startdate || ''}
+              max={formData.enddate || undefined}
+              onChange={(e) => {
+                const newStartDate = e.target.value
+                setFormData({ ...formData, startdate: newStartDate })
+
+              }}
+              /> 
+               -  
+              <input 
+              type="date" 
+              id="end"
+              value={formData.enddate || ''}
+              min={formData.startdate || undefined}
+              onChange={(e) => {
+                const newEndDate = e.target.value
+                setFormData({ ...formData, enddate: newEndDate })
+                // setDateRange(formatDisplayRange(formData.startdate, formData.enddate))
+
+              }}
+              /> 
             <input
               type="text"
               placeholder="Date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              value={fx.formatDisplayRange(formData.startdate, formData.enddate)}
+              onChange={(e) => setFormData({ ...formData, 
+                date: fx.formatDisplayRange(formData.startdate, formData.enddate) })}
               className="w-full mb-4 p-2 border rounded"
             />
             <input
@@ -259,7 +298,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
                   {formDetail.schedule.map((row, index) => (
                     <tr key={index}>
                     <td className="p-2 border">
-                        <input
+                        <DayPicker
                           type="text"
                           value={row.day}
                           onChange={(e) => updateScheduleCell(index, 'day', e.target.value)}
@@ -268,7 +307,7 @@ const EditEvent = ({ events, setEvents, editingEvent, setEditingEvent, onClose }
                         />
                       </td>
                       <td className="p-2 border">
-                        <input
+                        <TimePicker
                           type="text"
                           value={row.time}
                           onChange={(e) => updateScheduleCell(index, 'time', e.target.value)}
