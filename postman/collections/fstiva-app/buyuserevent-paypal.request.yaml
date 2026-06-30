@@ -1,5 +1,5 @@
 $kind: http-request
-name: buyuserevent
+name: buyuserevent-paypal
 url: http://localhost:5001/api/userevents
 method: POST
 headers:
@@ -10,7 +10,7 @@ body:
   content: "{\r
     \    \"eventId\": \"{{event_id}}\",\r
     \    \"price\": 100,\r
-    \    \"paymenttype\": \"card\"\r
+    \    \"paymenttype\": \"paypal\"\r
     }"
 scripts:
   - type: afterResponse
@@ -21,8 +21,8 @@ scripts:
       pm.test(\"Response contains booked event\", function () {\r
       pm.expect(pm.response.text()).to.include(\"price\");\r
       });\r
-      pm.test(\"Payment was processed via Factory+Strategy\", function () {\r
+      pm.test(\"PayPal payment was processed via Factory+Strategy\", function () {\r
       pm.expect(response).to.have.property(\"_id\");\r
       });"
     language: text/javascript
-order: 4500394779478137
+order: 4500394779478174

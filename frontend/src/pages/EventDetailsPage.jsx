@@ -103,13 +103,14 @@ useEffect(() => {
     navigate('/userpage');
   };
 
-const handleReserve = async () => {
+const handleReserve = async (paymentMethod) => {
   setIsReserving(true);
   try {
     const reserved = await reserveUserEvent({ 
       event: eventDetails, 
       token: user.token,
-      eventId: id
+      eventId: id,
+      paymentMethod
     });
     return reserved;  // Return instead of updating state
   } catch (error) {

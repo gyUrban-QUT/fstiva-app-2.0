@@ -83,16 +83,65 @@ class DecreaseAmountStrategy extends PricingStrategy {
     }
 }
 
+// Concrete Strategy: Early Bird Pricing (30% discount applied)
+class EarlyBirdPricingStrategy extends PricingStrategy {
+    constructor() {
+        super();
+        this.type = 'earlybird';
+        this.discountRate = 0.30; // 30% discount
+    }
+
+    async calculate({ eventId, qtyDiff }) {
+        const eventDet = await Event.findById(eventId);
+        const basePrice = Fun.numericPrice(eventDet.price);
+        const transactionPrice = basePrice * (1 - this.discountRate);
+
+        return {
+            transactionPrice: parseFloat(transactionPrice.toFixed(2)),
+            transactionType: 'B',
+            paymentType: 'earlybird'
+        };
+    }
+}
+
+// Concrete Strategy: Last Minute Pricing (20% surcharge applied)
+class LastMinutePricingStrategy extends PricingStrategy {
+    constructor() {
+        super();
+        this.type = 'lastminute';
+        this.surchargeRate = 0.20; // 20% surcharge
+    }
+
+    async calculate({ eventId, qtyDiff }) {
+        const eventDet = await Event.findById(eventId);
+        const basePrice = Fun.numericPrice(eventDet.price);
+        const transactionPrice = basePrice * (1 + this.surchargeRate);
+
+        return {
+            transactionPrice: parseFloat(transactionPrice.toFixed(2)),
+            transactionType: 'B',
+            paymentType: 'lastminute'
+        };
+    }
+}
+
 // Factory to select the correct strategy
 class PricingStrategyFactory {
     constructor() {
         this.strategies = {
             increase: new IncreaseAmountStrategy(),
-            decrease: new DecreaseAmountStrategy()
+            decrease: new DecreaseAmountStrategy(),
+            earlybird: new EarlyBirdPricingStrategy(),
+            lastminute: new LastMinutePricingStrategy()
         };
     }
 
-    getStrategy(qtyDiff) {
+    getStrategy(qtyDiff, pricingType = null) {
+        // If a specific pricing type is provided, use it
+        if (pricingType && this.strategies[pricingType]) {
+            return this.strategies[pricingType];
+        }
+        // Otherwise fall back to increase/decrease based on quantity
         const type = qtyDiff > 0 ? 'increase' : 'decrease';
         const strategy = this.strategies[type];
         if (!strategy) {
@@ -109,5 +158,7 @@ module.exports = {
     pricingFactory,
     PricingStrategyFactory,
     IncreaseAmountStrategy,
-    DecreaseAmountStrategy
+    DecreaseAmountStrategy,
+    EarlyBirdPricingStrategy,
+    LastMinutePricingStrategy
 };
