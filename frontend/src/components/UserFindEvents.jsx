@@ -5,6 +5,7 @@ import { getEventImage } from '../assets/eventImages';
 import { useNavigate } from 'react-router-dom';
 import { reserveUserEvent} from '../services/userEventService'
 import { renderButton} from '../components/ReserveButton'
+import PaymentMethodPopup from '../components/PaymentMethodPopup';
 
 const UserFindEvents = ({  onClose, onReserved }) => {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ const UserFindEvents = ({  onClose, onReserved }) => {
   const [allEvents, setAllEvents] = useState([]);  
   const [loading, setLoading] = useState(true); 
   const [submittingId, setSubmittingId] = useState(null);
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [pendingEvent, setPendingEvent] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleOpenDetails = (eventId) => {
     if (onClose) onClose();
@@ -36,25 +40,38 @@ const UserFindEvents = ({  onClose, onReserved }) => {
 
     if (user) {
       fetchAllEvents();
-      
     }
   }, [user]);
 
+  // Step 1: Reserve button clicked — show payment popup instead of reserving immediately
   const handleReserve = async (event) => {
+    setPendingEvent(event);
+    setShowPaymentPopup(true);
+  };
+
+  // Step 2: User confirmed payment method — now actually reserve
+  const handlePaymentConfirm = async (paymentMethod) => {
     try {
-      setSubmittingId(event._id);
+      setIsProcessing(true);
+      setSubmittingId(pendingEvent._id);
 
-      const reserved = await reserveUserEvent({ event, token: user.token });
+      const reserved = await reserveUserEvent({ 
+        event: pendingEvent, 
+        token: user.token,
+        paymentMethod
+      });
 
+      setShowPaymentPopup(false);
+      setPendingEvent(null);
       onReserved(reserved);
       onClose();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to reserve event.');
     } finally {
       setSubmittingId(null);
+      setIsProcessing(false);
     }
   };
-
 
  return (
     <div className="flex items-center justify-center w-full">
@@ -117,10 +134,7 @@ const UserFindEvents = ({  onClose, onReserved }) => {
                 </div>
                 
                 <div className="border p-2" style={{ borderColor: '#272727' }}>
-                  
-                  {/* render the conditional button */}
-                {renderButton(submittingId, event, event.isBooked, handleReserve)} 
-
+                  {renderButton(submittingId, event, event.isBooked, handleReserve)} 
                 </div>
               </div>
             </div>
@@ -128,6 +142,15 @@ const UserFindEvents = ({  onClose, onReserved }) => {
         )}
       </div>
     </div>
+
+    {/* Payment method popup */}
+    <PaymentMethodPopup
+      isOpen={showPaymentPopup}
+      onClose={() => { setShowPaymentPopup(false); setPendingEvent(null); }}
+      onConfirm={handlePaymentConfirm}
+      isProcessing={isProcessing}
+    />
+
     </div>
   );
 };
